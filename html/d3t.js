@@ -3,6 +3,8 @@ var canvas = document.getElementById("canvas");
 var manifest = {
 	"images": {
 		"logo": "images/logo.png",
+		"title-background": "images/title-background.png",
+		"start-button": "images/start-button.png",
 		"waffle-filled": "images/waffleFilled.png",
 		"waffle-hole": "images/waffleHole.png",
 		"sound-off": "images/sound-off-icon.png",
@@ -161,14 +163,22 @@ function drawIntroOverlay(context, scene) {
 	});
 	soundToggle.attachToRight(canvas, 12);
 	scene.camera.drawAbsolute(context, function() {
+
 		soundToggle.draw(context);
-		context.fillStyle = '#eed513';
-		context.fillRect(0,0,canvas.width,canvas.height);
+		//context.fillStyle = '#eed513';
+		//context.fillRect(0,0,canvas.width,canvas.height);
+		var titleBackground = game.images.get("title-background");
+		context.drawImage(titleBackground, 0, 0);
+
 		var logo = game.images.get("logo");
-		context.drawImage(logo, 0, 0);
+		context.drawImage(logo, (canvas.width/2) - (logo.width/2), 200);
+
+		var startButton = game.images.get("start-button");
+		context.drawImage(startButton,(canvas.width/2) - (startButton.width/2), 700);
+
 		context.fillStyle = "#fff";
 		context.font = "50px lato";
-		centerText(context, "Music by Glass Boy", 0, canvas.height - 90);
+		centerText(context, "Music by Glass Boy", 0, canvas.height - 60);
 	});
 }
 
@@ -248,7 +258,7 @@ function(elapsedMillis) {
 	score = Math.floor(columnsPassed);
 	var waffleFilledImage = game.images.get("waffle-filled");
 	if (waitingToStart) {
-		if (game.mouse.isPressed(0)) {
+		if (game.mouse.consumePressed(0)) {
 			speedIncrimenter = true;
 		  	game.sounds.play("music", true);
 			waitingToStart = false;
@@ -261,8 +271,6 @@ function(elapsedMillis) {
 		if(columnsPassed / 200 > 0.17){
 			this.camera.vx = columnsPassed / 200;
 		}
-		
-		
 	}
 
 	if (this.timers.fadeToBlack.running) {
@@ -271,18 +279,19 @@ function(elapsedMillis) {
 
 	this.squares = this.squares.concat(makeSquares(this, this.squares));
 
-	while (this.squares[0].x + this.squares[0].width < this.camera.x) {
-		if(this.squares[0].filled){
-			this.squares.shift();
-			columnsPassed +=.16;
-			
-		}else{
-			this.timers.fadeToBlack.start();
-			this.camera.vx = 0;
-			return;
+	if (!waitingToStart) {
+		while (this.squares[0].x + this.squares[0].width < this.camera.x) {
+			if(this.squares[0].filled){
+				this.squares.shift();
+				columnsPassed +=.16;
+				
+			}else{
+				this.timers.fadeToBlack.start();
+				this.camera.vx = 0;
+				return;
+			}
 		}
 	}
-
 	for (var i = 0; i < this.squares.length; i++) {
 		var square = this.squares[i];
 		if(game.mouse.consumePressed(0, square.x - this.camera.x, square.y, square.width, square.height)){

@@ -248,7 +248,7 @@ function(elapsedMillis) {
 	score = Math.floor(columnsPassed);
 	var waffleFilledImage = game.images.get("waffle-filled");
 	if (waitingToStart) {
-		if (game.mouse.isPressed(0)) {
+		if (game.mouse.consumePressed(0)) {
 			speedIncrimenter = true;
 		  	game.sounds.play("music", true);
 			waitingToStart = false;
