@@ -66,7 +66,6 @@ function setBest(b) {
 	Splat.saveData.set("bestScore", best);
 }
 
-var dead = false;
 var waitingToStart = true;
 var score = 0;
 var best = getBest();
@@ -110,7 +109,7 @@ function drawScoreScreen(context, scene) {
 
 function drawIntroOverlay(context, scene) {
 	scene.camera.drawAbsolute(context, function() {
-		context.fillStyle = '#b6d3aa';
+		context.fillStyle = '#000';
 		context.fillRect(0,0,canvas.width,canvas.height);
 		var logo = game.images.get("logo");
 		context.drawImage(logo, (canvas.width / 2) - (logo.width / 2)|0, 200);
@@ -151,11 +150,12 @@ function makeSquareColumn(x){
 	return squares;
 }
 
+
+
 function findMaxX(entities){
 	return entities.reduce(function(a,b){
 		return Math.max(a,b.x);
 	}, 0);
-
 }
 
 function makeSquares(scene, squares){
@@ -169,39 +169,48 @@ function makeSquares(scene, squares){
 
 
 
-
 game.scenes.add("main", new Splat.Scene(canvas, function() {
-
-	this.camera.vx = 0.1;
+	this.camera.x = 0;
 	waitingToStart = true;
-	dead = false;
+	
 	
 	score = 0;
 	newBest = false;
 
 	this.squares = [];
 
-	this.timers.fadeToBlack = new Splat.Timer(null, 800, function() {
+	this.timers.fadeToBlack = new Splat.Timer(null, 1000, function() {
 		game.scenes.switchTo("main");
 	});
 
 
 },
 function(elapsedMillis) {
+	
 	var waffleFilledImage = game.images.get("waffle-filled");
 	if (waitingToStart) {
 		if (game.mouse.isPressed(0)) {
+			this.camera.vx = 0.1;
 		  //game.sounds.play("music", true);
 			waitingToStart = false;
 		}
 	}
 
-	if (dead) {
+	if (this.timers.fadeToBlack.running) {
 		return;
 	}
 
 	this.squares = this.squares.concat(makeSquares(this, this.squares));
 
+	while (this.squares[0].x + this.squares[0].width < this.camera.x) {
+		if(this.squares[0].filled){
+			this.squares.shift();
+		}else{
+			this.timers.fadeToBlack.start();
+			this.camera.vx = 0;
+			return;
+		}
+	}
 
 	for (var i = 0; i < this.squares.length; i++) {
 		var square = this.squares[i];
@@ -216,7 +225,7 @@ function(elapsedMillis) {
 
 function(context) {
 
-	context.fillStyle = 'lime';
+	context.fillStyle = '#fff';
 	context.fillRect(0,0,canvas.width,canvas.height);
 
 
@@ -231,13 +240,14 @@ function(context) {
 
 	if (waitingToStart) {
 		drawIntroOverlay(context, this);
+	}else{
+		this.camera.drawAbsolute(context, function() {
+			context.fillStyle = "#ffffff";
+			context.font = "100px lato";
+			centerText(context, score, 0, 100);
+		});
 	}
-
-	this.camera.drawAbsolute(context, function() {
-		context.fillStyle = "#ffffff";
-		context.font = "100px lato";
-		centerText(context, score, 0, 100);
-	});
+	
 
 }));
 
