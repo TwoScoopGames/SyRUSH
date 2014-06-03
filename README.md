@@ -1,5 +1,1 @@
-Dont-Tap-the-Things
-==========================
-
-
-A game about tapping some things, while not tapping other things.
+![alt tag](https://raw.githubusercontent.com/TwoScoopGames/SyRUSH/master/ios/App/images/logo.png)
