@@ -165,7 +165,7 @@ function drawIntroOverlay(context, scene) {
 		context.fillStyle = '#eed513';
 		context.fillRect(0,0,canvas.width,canvas.height);
 		var logo = game.images.get("logo");
-		context.drawImage(logo, (canvas.width / 2) - (logo.width / 2)|0, 200);
+		context.drawImage(logo, 0, 0);
 		context.fillStyle = "#fff";
 		context.font = "50px lato";
 		centerText(context, "Music by Glass Boy", 0, canvas.height - 90);
