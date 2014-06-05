@@ -2,7 +2,10 @@ var canvas = document.getElementById("canvas");
 
 var manifest = {
 	"images": {
+		"ad-placeholder": "images/ad-placeholder.png",
 		"logo": "images/logo.png",
+		"title-background": "images/title-background.png",
+		"start-button": "images/start-button.png",
 		"waffle-filled": "images/waffleFilled.png",
 		"waffle-hole": "images/waffleHole.png",
 		"sound-off": "images/sound-off-icon.png",
@@ -10,7 +13,8 @@ var manifest = {
 	},
 	"sounds": {
 		"music" : "sound/Glass_Boy_-_02_-_Bent.mp3",
-		"bad-tap" : "sound/bad.mp3",
+		"bad-tap" : "sound/196725__paulmorek__sz-squish-12.wav",
+		"gasp" : "sound/180005__gentlemanwalrus__shocked-gasp.wav",
 		"pop1" : "sound/pop1.wav",
 		"pop2" : "sound/pop2.wav",
 		"pop3" : "sound/pop3.wav",
@@ -19,7 +23,7 @@ var manifest = {
 		"pop6" : "sound/pop6.wav",
 		"pop7" : "sound/pop7.wav",
 		"pop8" : "sound/pop8.wav"
-		
+
 	},
 	"fonts": {
 		"lato": {
@@ -38,52 +42,13 @@ var manifest = {
 		}
 	}
 };
-function ToggleButton(x, y, width, height, onIcon, offIcon, key, onToggle) {
-	this.x = x;
-	this.y = y;
-	this.width = width;
-	this.height = height;
-	this.onIcon = onIcon;
-	this.offIcon = offIcon;
-	this.key = key;
-	this.toggled = true;
-	this.onToggle = onToggle;
-}
-ToggleButton.prototype.move = function(elapsedMillis) {
-	if (scurry.mouse.buttons[0] && scurry.mouse.x >= this.x && scurry.mouse.x < this.x + this.width && scurry.mouse.y >= this.y && scurry.mouse.y < this.y + this.height) {
-		scurry.mouse.buttons[0] = false;
-		this.toggle();
-	}
-	if (scurry.keyboard.consumePressed(this.key)) {
-		this.toggle();
-	}
-};
-ToggleButton.prototype.draw = function(context) {
-	var icon = this.offIcon;
-	if (this.toggled) {
-		icon = this.onIcon;
-	}
-	context.drawImage(icon, this.x, this.y);
-};
-ToggleButton.prototype.toggle = function() {
-	if (this.onToggle(!this.toggled) !== false) {
-		this.toggled = !this.toggled;
-	}
-};
-ToggleButton.prototype.attachToRight = function(canvas, xOffset) {
-	var that = this;
-	var adjustX = function() {
-		that.x = canvas.width - that.width - xOffset;
-	};
-	adjustX();
-	window.addEventListener("resize", adjustX);
-};
+
 
 var game = new Splat.Game(canvas, manifest);
-var soundToggle;
-game.scenes.add("title", new Splat.Scene(canvas, function() {
-	
+var muteSounds = false;
+var gravity = 2;
 
+game.scenes.add("title", new Splat.Scene(canvas, function() {
 	this.timers.running = new Splat.Timer(null, 2000, function() {
 		game.scenes.switchTo("main");
 	});
@@ -118,7 +83,40 @@ var waitingToStart = true;
 var score = 0;
 var best = Math.floor(getBest());
 var newBest = false;
-var rand = new Splat.math.Random();
+
+function makeCircle(color, radius, strokeColor, strokeSize, x, y){
+  this.beginPath();
+  this.arc(x, y, radius, 0, 2 * Math.PI, false);
+  this.fillStyle = color;
+  this.fill();
+  this.lineWidth = strokeSize;
+  this.strokeStyle = strokeColor;
+  this.stroke();
+}
+
+var temp = {};
+var circles=[];
+
+function Circle(x,y,xv,yv,r){
+  return {x:x,y:y,xv:xv,yv:yv,r:r};
+};
+
+function spray(mouse, drops){
+	circles.length = 0;
+	var velocity = 5;
+	while(drops--){
+		circles.push(
+			Circle( 
+				mouse.x, 
+				mouse.y,
+				(Math.random() - .5) * velocity,
+				(Math.random() - .5) * velocity,
+				Math.random()*25
+				)		
+			);
+	}
+}
+
 
 function centerText(context, text, offsetX, offsetY) {
 	var w = context.measureText(text).width;
@@ -126,8 +124,6 @@ function centerText(context, text, offsetX, offsetY) {
 	var y = offsetY |0;
 	context.fillText(text, x, y);
 }
-
-
 
 function drawScoreScreen(context, scene) {
 	var ftb = scene.timers.fadeToBlack.time;
@@ -155,20 +151,37 @@ function drawScoreScreen(context, scene) {
 	});
 }
 
+
+
 function drawIntroOverlay(context, scene) {
-	soundToggle = new ToggleButton(0, 108, 72, 72, game.images.get("sound-on"), game.images.get("sound-off"), "m", function(toggled) {
-		scurry.sounds.muted = !toggled;
-	});
-	soundToggle.attachToRight(canvas, 12);
 	scene.camera.drawAbsolute(context, function() {
-		soundToggle.draw(context);
-		context.fillStyle = '#eed513';
-		context.fillRect(0,0,canvas.width,canvas.height);
+
+		var titleBackground = game.images.get("title-background");
+		context.drawImage(titleBackground, 0, 0);
+
 		var logo = game.images.get("logo");
-		context.drawImage(logo, 0, 0);
+		context.drawImage(logo, (canvas.width/2) - (logo.width/2), 200);
+
+		var startButton = game.images.get("start-button");
+		context.drawImage(startButton,(canvas.width/2) - (startButton.width/2), 700);
+
 		context.fillStyle = "#fff";
 		context.font = "50px lato";
-		centerText(context, "Music by Glass Boy", 0, canvas.height - 90);
+		centerText(context, "Music by Glass Boy", 0, canvas.height - 60);
+
+		var adPlaceholder = game.images.get("ad-placeholder");
+		context.drawImage(adPlaceholder, 0, 0);
+
+
+		if(muteSounds){
+			var soundSwitch = game.images.get("sound-off");
+
+		}else{
+			var soundSwitch = game.images.get("sound-on");
+
+		}
+		context.drawImage(soundSwitch, (canvas.width - soundSwitch.width) - 10, 110);
+
 	});
 }
 
@@ -184,11 +197,15 @@ function drawFlash(context, scene) {
 }
 
 var squareSize = 200;
-
 function makeSquare(x, y){
 	var waffleHoleImage = game.images.get("waffle-hole");
 	var waffleFilledImage = game.images.get("waffle-filled");
-	var isFilled = Math.random() > .5;
+	if(x < 800){
+		var isFilled = true;
+	}else{
+		var isFilled = Math.random() > .5;
+	}
+	
 	var image = isFilled ? waffleFilledImage : waffleHoleImage;
 	var entity = new Splat.AnimatedEntity(x,y,squareSize,squareSize, image, 0, 0);
 	entity.filled = isFilled;
@@ -198,12 +215,10 @@ function makeSquare(x, y){
 function makeSquareColumn(x){
 	var squares = [];
 	for(var y = 0; y < canvas.height; y+= squareSize){
-		squares.push(makeSquare(x, y));
+		squares.unshift(makeSquare(x, y));
 	}
 	return squares;
 }
-
-
 
 function findMaxX(entities){
 	return entities.reduce(function(a,b){
@@ -227,12 +242,18 @@ function fillSound() {
 	game.sounds.play(fillSounds[i]);
 }
 
+function isInside(container, x, y) {
+	return x >= container.x &&
+	x < container.x + container.width &&
+	y >= container.y &&
+	y < container.y + container.height;
+}
+
 game.scenes.add("main", new Splat.Scene(canvas, function() {
 	this.camera.x = 0;
-	speedIncrimenter = false;
 	columnsPassed = 0;
 	waitingToStart = true;
-	
+
 	score = 0;
 	newBest = false;
 
@@ -244,26 +265,41 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 
 
 },
-function(elapsedMillis) {
+function simulation(elapsedMillis) {
+
+	temp.elapsedMillis = elapsedMillis;
+
+	if(muteSounds){
+		game.sounds.stop("music");
+	}
 	score = Math.floor(columnsPassed);
 	var waffleFilledImage = game.images.get("waffle-filled");
+
 	if (waitingToStart) {
-		if (game.mouse.consumePressed(0)) {
-			speedIncrimenter = true;
-		  	game.sounds.play("music", true);
-			waitingToStart = false;
+		var soundSwitch = new Splat.Entity((canvas.width - 72) - 10, 110, 72, 72);
+		if (isInside(soundSwitch, game.mouse.x, game.mouse.y)){
+
+			if (game.mouse.consumePressed(0)) {
+				console.log("muteSounds status: ", muteSounds);
+				if(muteSounds === true){
+					muteSounds = false;
+				}else{
+					muteSounds = true;
+				}
+				console.log("muteSounds status: ", muteSounds);
+			}
+
+		}else{	
+			if (game.mouse.consumePressed(0)) {
+				if(!muteSounds){ game.sounds.play("music", true); }
+				waitingToStart = false;
+			}
 		}
+
 	}
-	if(speedIncrimenter){
-		if(columnsPassed === 0){
-			this.camera.vx = 0.17;
-		}
-		if(columnsPassed / 200 > 0.17){
-			this.camera.vx = columnsPassed / 200;
-		}
-		
-		
-	}
+
+	this.camera.vx = 0.23;
+
 
 	if (this.timers.fadeToBlack.running) {
 		return;
@@ -271,42 +307,51 @@ function(elapsedMillis) {
 
 	this.squares = this.squares.concat(makeSquares(this, this.squares));
 
-	while (this.squares[0].x + this.squares[0].width < this.camera.x) {
-		if(this.squares[0].filled){
-			this.squares.shift();
-			columnsPassed +=.16;
-			
-		}else{
-			this.timers.fadeToBlack.start();
-			this.camera.vx = 0;
-			return;
+	if (!waitingToStart) {
+		while (this.squares[0].x + this.squares[0].width < this.camera.x) {
+			if(this.squares[0].filled){
+				this.squares.shift();
+				columnsPassed +=.16;
+			}else{
+				if(!muteSounds){  game.sounds.play("gasp"); }
+				this.timers.fadeToBlack.start();
+				this.camera.vx = 0;
+				return;
+			}
 		}
 	}
+
+
 
 	for (var i = 0; i < this.squares.length; i++) {
 		var square = this.squares[i];
 		if(game.mouse.consumePressed(0, square.x - this.camera.x, square.y, square.width, square.height)){
 			if(!square.filled){
-				fillSound();
+				if(!muteSounds){ fillSound(); }
 				square.filled = true;
-			square.sprite = waffleFilledImage;
-		}else{
-			game.sounds.play("bad-tap");
-			this.timers.fadeToBlack.start();
-			this.camera.vx = 0;
-			return;
-		}
+				square.sprite = waffleFilledImage;
+				spray(game.mouse, 8);
+				}else{
+					if(!muteSounds){  game.sounds.play("bad-tap"); }
+					spray(game.mouse, 800);
+					setTimeout(function(){
+						
+						this.timers.fadeToBlack.start();
+						this.camera.vx = 0;
+						return;
+					}, 500 * elapsedMillis);
+				
+			}
 
 		}
 	}
 
 },
 
-function(context) {
+function draw(context) {
 
 	context.fillStyle = '#fff';
 	context.fillRect(0,0,canvas.width,canvas.height);
-
 
 	for (var i = 0; i < this.squares.length; i++) {
 		this.squares[i].draw(context);
@@ -323,10 +368,19 @@ function(context) {
 		this.camera.drawAbsolute(context, function() {
 			context.fillStyle = "#ffffff";
 			context.font = "100px lato";
-			centerText(context, Math.floor(score), 0, 100);
+			centerText(context, Math.floor(score), 0, 100); 
+			for(var i = 0; i < circles.length; i++){
+				var circle=circles[i];
+				makeCircle.apply(context, ["#6d511f",circle.r,"#2d1e05",0,circle.x,circle.y]);
+				circle.x+=circle.xv * temp.elapsedMillis;
+				circle.y+=circle.yv * temp.elapsedMillis;
+				circle.y+= temp.elapsedMillis*gravity;
+
+			}
 		});
 	}
-	
+
+ 
 
 }));
 
