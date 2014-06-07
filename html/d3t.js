@@ -361,9 +361,20 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 
 
 
+		if (dead) {
+			return;
+		}
 		for (var i = 0; i < this.squares.length; i++) {
 			var square = this.squares[i];
-			if (game.mouse.consumePressed(0, square.x - this.camera.x, square.y, square.width, square.height) && !dead) {
+			for (var t = 0; t < game.mouse.touches.length; t++) {
+				var touch = game.mouse.touches[t];
+				if (touch.consumed) {
+					continue;
+				}
+				if (!isInside(square, touch.x + this.camera.x, touch.y)) {
+					continue;
+				}
+				touch.consumed = true;
 				if (!square.filled) {
 					if (!muteSounds) {
 						fillSound();
@@ -382,12 +393,9 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 						this.camera.vx = 0;
 						return;
 					}, 500);
-
 				}
-
 			}
 		}
-
 	},
 
 	function draw(context) {
