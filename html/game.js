@@ -1,3 +1,4 @@
+"use strict";
 var canvas = document.getElementById("canvas");
 
 var manifest = {
@@ -54,7 +55,7 @@ var syrupParticles = [];
 var gravity = 0.2;
 var tileSize = 200;
 var fillSounds = ["pop1", "pop2", "pop3", "pop4", "pop5", "pop6", "pop7", "pop8"];
-
+var waffleWidth = 5;
 
 
 function getBest() {
@@ -143,19 +144,6 @@ function drawScoreScreen(context, scene) {
 	});
 }
 
-
-
-function drawFlash(context, scene) {
-	var flashTime = scene.timers.flash.time;
-	var flashLen = scene.timers.flash.expireMillis;
-
-	if (flashTime > 0) {
-		var opacity = Splat.math.oscillate(flashTime, flashLen);
-		context.fillStyle = "rgba(255, 255, 255, " + opacity + ")";
-		context.fillRect(scene.camera.x, scene.camera.y, canvas.width, canvas.height);
-	}
-}
-
 function makeSquare(x, y) {
 	var waffleHoleImage = game.images.get("waffle-hole");
 	var waffleFilledImage = game.images.get("waffle-filled");
@@ -172,15 +160,7 @@ function makeSquare(x, y) {
 	return entity;
 }
 
-var first = true;
-
 function makeSquareColumn(x) {
-
-	if (first) {
-		console.log(x);
-		first = false;
-	}
-
 	var squares = [];
 	for (var y = 0; y < canvas.height; y += tileSize) {
 		squares.unshift(makeSquare(x, y));
@@ -188,20 +168,10 @@ function makeSquareColumn(x) {
 	return squares;
 }
 
-function findMaxX(entities) {
-	return entities.reduce(function(a, b) {
-		return Math.max(a, b.x);
-	}, -200);
-}
-
-function makeSquares(scene, squares) {
-	var maxX = findMaxX(squares);
+function makeWaffle(squaresWide, filledImage, emptyImage) {
 	var newSquares = [];
-	if (maxX < scene.camera.x + canvas.width) {
-		if (first) {
-			console.log("scene camera x: ", scene.camera.x);
-		}
-		newSquares = newSquares.concat(makeSquareColumn(maxX + tileSize));
+	for (var i = 0; i < squaresWide; i++) {
+		newSquares = newSquares.concat(makeSquareColumn(i * tileSize, filledImage, emptyImage));
 	}
 	return newSquares;
 }
@@ -289,15 +259,15 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	}));
 
 game.scenes.add("main", new Splat.Scene(canvas, function() {
-		first = true;
-		this.camera.x = 0;
-
-
+		this.camera.x = -canvas.width;
+		this.camera.vx = 0.30;
+		var waffleFilledImage = game.images.get("waffle-filled");
+		var waffleHoleImage = game.images.get("waffle-hole");
+		this.squares = makeWaffle(waffleWidth, waffleFilledImage, waffleHoleImage);
 
 		score = 0;
 		newBest = false;
 
-		this.squares = [];
 
 		this.timers.fadeToBlack = new Splat.Timer(null, 1000, function() {
 			game.scenes.switchTo("game-title");
@@ -306,8 +276,14 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 
 	},
 	function simulation(elapsedMillis) {
+		var waffleFilledImage = game.images.get("waffle-filled");
+		var waffleHoleImage = game.images.get("waffle-hole");
+		if (this.camera.x >= (waffleWidth * tileSize) && this.camera.vx > 0) {
+			console.log("switching directions");
+			this.camera.vx *= -1;
+			this.squares = makeWaffle(waffleWidth, waffleFilledImage, waffleHoleImage);
 
-
+		}
 		moveParticles(elapsedMillis, syrupParticles, true);
 		var waffleFilledImage = game.images.get("waffle-filled");
 
@@ -316,27 +292,36 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 			return;
 		}
 
-		this.camera.vx = 1;
-		this.squares = this.squares.concat(makeSquares(this, this.squares));
+		var scene = this;
 
-		while (this.squares[0].x + this.squares[0].width < this.camera.x) {
-			if (this.squares[0].filled) {
-				var last = this.squares.shift();
-				if (last.x !== this.squares[0].x) {
+		var movingRight = this.camera.vx > 0;
+
+		function isOffScreen(entity) {
+			return movingRight ? entity.x + entity.width < scene.camera.x : entity.x > scene.camera.x + scene.camera.width;
+		}
+
+		while (this.squares.length > 0) {
+			var currentSquareIndex = movingRight ? 0 : this.squares.length - 1;
+			var nextSquareIndex = movingRight ? 1 : this.squares.length - 2;
+			var nextSquare = this.squares[nextSquareIndex];
+			var isSquareOffScreen = isOffScreen(this.squares[currentSquareIndex]);
+			if (!isSquareOffScreen) {
+				break;
+			}
+			var last = this.squares.splice(currentSquareIndex, 1)[0];
+			console.log("last", last);
+			if (last.filled) {
+				if (last.x !== nextSquare.x) {
 					score++;
 				}
-
 			} else {
-
+				console.log("this.squares: ", this.squares);
 				game.sounds.play("gasp");
-
 				this.timers.fadeToBlack.start();
 				this.camera.vx = 0;
 				return;
 			}
 		}
-
-
 
 		for (var i = 0; i < this.squares.length; i++) {
 			var square = this.squares[i];
@@ -356,6 +341,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 					square.filled = true;
 					square.sprite = waffleFilledImage;
 					spray(game.mouse, 5, 25, 8);
+					console.log("click square: ", this.squares);
 				} else {
 
 					game.sounds.play("bad-tap");
@@ -369,7 +355,9 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 	function draw(context) {
 
 		context.fillStyle = "#fff";
-		context.fillRect(0, 0, canvas.width, canvas.height);
+		context.fillRect(-canvas.width, 0, canvas.width, canvas.height);
+		context.fillStyle = "#fff";
+		context.fillRect(waffleWidth * tileSize, 0, canvas.width, canvas.height);
 
 		for (var i = 0; i < this.squares.length; i++) {
 			this.squares[i].draw(context);
