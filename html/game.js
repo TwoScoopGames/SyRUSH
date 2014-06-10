@@ -47,9 +47,6 @@ var manifest = {
 
 
 var game = new Splat.Game(canvas, manifest);
-var dead = false;
-var muteSounds = false;
-var waitingToStart = true;
 var columnsPassed = 0;
 var score = 0;
 var best = Math.floor(getBest());
@@ -147,37 +144,7 @@ function drawScoreScreen(context, scene) {
 	});
 }
 
-function drawIntroOverlay(context, scene) {
-	scene.camera.drawAbsolute(context, function() {
 
-		var titleBackground = game.images.get("title-background");
-		context.drawImage(titleBackground, 0, 0);
-
-		var logo = game.images.get("logo");
-		context.drawImage(logo, (canvas.width / 2) - (logo.width / 2), 200);
-
-		var startButton = game.images.get("start-button");
-		context.drawImage(startButton, (canvas.width / 2) - (startButton.width / 2), 700);
-
-		context.fillStyle = "#fff";
-		context.font = "50px lato";
-		centerText(context, "Music by Glass Boy", 0, canvas.height - 60);
-
-		var adPlaceholder = game.images.get("ad-placeholder");
-		context.drawImage(adPlaceholder, 0, 0);
-
-
-		if (muteSounds) {
-			var soundSwitch = game.images.get("sound-off");
-
-		} else {
-			var soundSwitch = game.images.get("sound-on");
-
-		}
-		context.drawImage(soundSwitch, (canvas.width - soundSwitch.width), 100);
-
-	});
-}
 
 function drawFlash(context, scene) {
 	var flashTime = scene.timers.flash.time;
@@ -193,10 +160,11 @@ function drawFlash(context, scene) {
 function makeSquare(x, y) {
 	var waffleHoleImage = game.images.get("waffle-hole");
 	var waffleFilledImage = game.images.get("waffle-filled");
+	var isFilled = false;
 	if (x < 800) {
-		var isFilled = true;
+		isFilled = true;
 	} else {
-		var isFilled = Math.random() > 0.5;
+		isFilled = Math.random() > 0.5;
 	}
 
 	var image = isFilled ? waffleFilledImage : waffleHoleImage;
@@ -205,7 +173,15 @@ function makeSquare(x, y) {
 	return entity;
 }
 
+var first = true;
+
 function makeSquareColumn(x) {
+
+	if (first) {
+		console.log(x);
+		first = false;
+	}
+
 	var squares = [];
 	for (var y = 0; y < canvas.height; y += tileSize) {
 		squares.unshift(makeSquare(x, y));
@@ -216,13 +192,16 @@ function makeSquareColumn(x) {
 function findMaxX(entities) {
 	return entities.reduce(function(a, b) {
 		return Math.max(a, b.x);
-	}, 0);
+	}, -200);
 }
 
 function makeSquares(scene, squares) {
 	var maxX = findMaxX(squares);
 	var newSquares = [];
 	if (maxX < scene.camera.x + canvas.width) {
+		if (first) {
+			console.log("scene camera x: ", scene.camera.x);
+		}
 		newSquares = newSquares.concat(makeSquareColumn(maxX + tileSize));
 	}
 	return newSquares;
@@ -245,8 +224,8 @@ function isInside(container, x, y) {
 ===========================================*/
 
 game.scenes.add("title", new Splat.Scene(canvas, function() {
-	this.timers.running = new Splat.Timer(null, 2000, function() {
-		game.scenes.switchTo("main");
+	this.timers.running = new Splat.Timer(null, 1, function() {
+		game.scenes.switchTo("game-title");
 	});
 	this.timers.running.start();
 }, function(elapsedMillis) {
@@ -262,10 +241,59 @@ game.scenes.add("title", new Splat.Scene(canvas, function() {
 	anim.draw(context, (canvas.width / 2) - (anim.width / 2), (canvas.height / 2) - (anim.height / 2));
 }));
 
+game.scenes.add("game-title", new Splat.Scene(canvas, function() {
+
+	}, function(elapsedMillis) {
+
+		if (game.mouse.consumePressed(0, (canvas.width - 115), 100, 115, 109)) {
+			game.sounds.muted = !game.sounds.muted;
+			if (game.sounds.muted) {
+				game.sounds.stop("music");
+			}
+		}
+		if (game.mouse.consumePressed(0)) {
+			game.sounds.play("button");
+			game.sounds.play("music", true);
+			game.scenes.switchTo("main");
+		}
+	},
+	function(context) {
+		this.camera.drawAbsolute(context, function() {
+
+			var titleBackground = game.images.get("title-background");
+			context.drawImage(titleBackground, 0, 0);
+
+			var logo = game.images.get("logo");
+			context.drawImage(logo, (canvas.width / 2) - (logo.width / 2), 200);
+
+			var startButton = game.images.get("start-button");
+			context.drawImage(startButton, (canvas.width / 2) - (startButton.width / 2), 700);
+
+			context.fillStyle = "#fff";
+			context.font = "50px lato";
+			centerText(context, "Music by Glass Boy", 0, canvas.height - 60);
+
+			var adPlaceholder = game.images.get("ad-placeholder");
+			context.drawImage(adPlaceholder, 0, 0);
+
+			var soundSwitch;
+			if (game.sounds.muted) {
+				soundSwitch = game.images.get("sound-off");
+			} else {
+				soundSwitch = game.images.get("sound-on");
+			}
+			context.drawImage(soundSwitch, (canvas.width - soundSwitch.width), 100);
+
+		});
+
+
+	}));
+
 game.scenes.add("main", new Splat.Scene(canvas, function() {
+		first = true;
 		this.camera.x = 0;
 		columnsPassed = 0;
-		waitingToStart = true;
+
 
 		score = 0;
 		newBest = false;
@@ -273,7 +301,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		this.squares = [];
 
 		this.timers.fadeToBlack = new Splat.Timer(null, 1000, function() {
-			game.scenes.switchTo("main");
+			game.scenes.switchTo("game-title");
 		});
 
 
@@ -282,88 +310,33 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 
 
 		moveParticles(elapsedMillis, syrupParticles, true);
-
-
-		if (muteSounds) {
-			game.sounds.stop("music");
-		}
 		score = Math.floor(columnsPassed);
 		var waffleFilledImage = game.images.get("waffle-filled");
-
-		if (waitingToStart) {
-			var soundSwitch = new Splat.Entity((canvas.width - 115), 100, 115, 109);
-			if (isInside(soundSwitch, game.mouse.x, game.mouse.y)) {
-
-				if (game.mouse.consumePressed(0)) {
-					if (muteSounds === true) {
-						muteSounds = false;
-					} else {
-						muteSounds = true;
-					}
-				}
-
-			} else {
-				if (game.mouse.consumePressed(0)) {
-					if (!muteSounds) {
-						game.sounds.play("button");
-					}
-					setTimeout(function() {
-
-						if (!muteSounds) {
-							game.sounds.play("music", true);
-						}
-						waitingToStart = false;
-						dead = false;
-					}, 200);
-
-				}
-			}
-
-		}
-		if (score <= 5) {
-			this.camera.vx = 0.20;
-		}
-		// if (score === 6) {
-		// 	if (!muteSounds) {
-		// 		game.sounds.play("yay");
-		// 	}
-		// }
-		if (6 >= score >= 20) {
-
-			this.camera.vx = -0.25;
-		} else if (21 >= score) {
-			this.camera.vx = 0.3;
-		}
-
 
 
 		if (this.timers.fadeToBlack.running) {
 			return;
 		}
 
+		this.camera.vx = 1;
 		this.squares = this.squares.concat(makeSquares(this, this.squares));
 
-		if (!waitingToStart) {
-			while (this.squares[0].x + this.squares[0].width < this.camera.x) {
-				if (this.squares[0].filled) {
-					this.squares.shift();
-					columnsPassed += 0.16;
-				} else {
-					if (!muteSounds) {
-						game.sounds.play("gasp");
-					}
-					this.timers.fadeToBlack.start();
-					this.camera.vx = 0;
-					return;
-				}
+		while (this.squares[0].x + this.squares[0].width < this.camera.x) {
+			if (this.squares[0].filled) {
+				this.squares.shift();
+				columnsPassed += 0.16;
+			} else {
+
+				game.sounds.play("gasp");
+
+				this.timers.fadeToBlack.start();
+				this.camera.vx = 0;
+				return;
 			}
 		}
 
 
 
-		if (dead) {
-			return;
-		}
 		for (var i = 0; i < this.squares.length; i++) {
 			var square = this.squares[i];
 			for (var t = 0; t < game.mouse.touches.length; t++) {
@@ -376,23 +349,17 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 				}
 				touch.consumed = true;
 				if (!square.filled) {
-					if (!muteSounds) {
-						fillSound();
-					}
+
+					fillSound();
+
 					square.filled = true;
 					square.sprite = waffleFilledImage;
 					spray(game.mouse, 5, 25, 8);
 				} else {
-					if (!muteSounds) {
-						game.sounds.play("bad-tap");
-					}
+
+					game.sounds.play("bad-tap");
+
 					spray(game.mouse, 5, 25, 100);
-					dead = true;
-					setTimeout(function() {
-						this.timers.fadeToBlack.start();
-						this.camera.vx = 0;
-						return;
-					}, 500);
 				}
 			}
 		}
@@ -412,16 +379,14 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 			return;
 		}
 
-		if (waitingToStart) {
-			drawIntroOverlay(context, this);
-		} else {
-			this.camera.drawAbsolute(context, function() {
-				context.fillStyle = "#ffffff";
-				context.font = "100px lato";
-				centerText(context, Math.floor(score), 0, 100);
-				drawParticles(context, syrupParticles);
-			});
-		}
+
+		this.camera.drawAbsolute(context, function() {
+			context.fillStyle = "#ffffff";
+			context.font = "100px lato";
+			centerText(context, Math.floor(score), 0, 100);
+			drawParticles(context, syrupParticles);
+		});
+
 
 	}));
 
