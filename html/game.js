@@ -47,7 +47,6 @@ var manifest = {
 
 
 var game = new Splat.Game(canvas, manifest);
-var columnsPassed = 0;
 var score = 0;
 var best = Math.floor(getBest());
 var newBest = false;
@@ -292,7 +291,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 game.scenes.add("main", new Splat.Scene(canvas, function() {
 		first = true;
 		this.camera.x = 0;
-		columnsPassed = 0;
+
 
 
 		score = 0;
@@ -310,7 +309,6 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 
 
 		moveParticles(elapsedMillis, syrupParticles, true);
-		score = Math.floor(columnsPassed);
 		var waffleFilledImage = game.images.get("waffle-filled");
 
 
@@ -323,8 +321,11 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 
 		while (this.squares[0].x + this.squares[0].width < this.camera.x) {
 			if (this.squares[0].filled) {
-				this.squares.shift();
-				columnsPassed += 0.16;
+				var last = this.squares.shift();
+				if (last.x !== this.squares[0].x) {
+					score++;
+				}
+
 			} else {
 
 				game.sounds.play("gasp");
