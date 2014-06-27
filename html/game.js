@@ -273,6 +273,22 @@ var levels = [
 		particleColor: "#6d511f",
 		width: 10,
 		speed: -0.30
+	},
+	{
+		filledImage: "butter-filled",
+		emptyImage: "waffle-hole",
+		fillAnim: "butter-anim",
+		particleColor: "yellow",
+		width: 10,
+		speed: 0.50
+	},
+	{
+		filledImage: "butter-syrup-filled",
+		emptyImage: "butter-filled",
+		fillAnim: "butter-syrup-anim",
+		particleColor: "#6d511f",
+		width: 10,
+		speed: -0.50
 	}
 ];
 
@@ -288,19 +304,36 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 	score = 0;
 	newBest = false;
 
-	level++;
-	this.camera.vx = levels[level].speed;
-	this.squares = makeWaffleForLevel();
+	this.nextLevel = function() {
+		level++;
+		if (level >= levels.length) {
+			level = -1;
+			game.scenes.switchTo("game-title");
+			return;
+		}
+		this.camera.vx = levels[level].speed;
+		this.squares = makeWaffleForLevel();
+	}.bind(this);
+	this.nextLevel();
 
 	this.timers.fadeToBlack = new Splat.Timer(null, 1000, function() {
 		game.scenes.switchTo("game-title");
 	});
+	var scene = this;
+	this.timers.nextLevel = new Splat.Timer(null, 1000, function() {
+		scene.nextLevel();
+	});
 }, function(elapsedMillis) {
 	if (this.camera.x >= (levels[level].width * tileSize) + game.images.get("bg-right").width - canvas.width && this.camera.vx > 0) {
-		level++;
-		this.camera.vx = levels[level].speed;
-		this.squares = makeWaffleForLevel();
+		this.nextLevel();
 	}
+	if (this.camera.x < -game.images.get("bg-left").width && this.camera.vx < 0 && !this.timers.nextLevel.running) {
+		this.camera.x = -game.images.get("bg-left").width;
+		this.camera.vx = 0;
+		game.sounds.play("yay");
+		this.timers.nextLevel.start();
+	}
+
 	moveParticles(elapsedMillis, syrupParticles, true);
 
 	if (this.timers.fadeToBlack.running) {
