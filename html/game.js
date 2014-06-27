@@ -320,18 +320,23 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		game.scenes.switchTo("game-title");
 	});
 	var scene = this;
-	this.timers.nextLevel = new Splat.Timer(null, 1000, function() {
-		scene.nextLevel();
-	});
+	this.timers.banner = new Splat.Timer(null, 1000, null);
 }, function(elapsedMillis) {
+	var scene = this;
 	if (this.camera.x >= (levels[level].width * tileSize) + game.images.get("bg-right").width - canvas.width && this.camera.vx > 0) {
+		this.message = "Next topping!";
+		this.timers.banner.reset();
+		this.timers.banner.start();
 		this.nextLevel();
 	}
-	if (this.camera.x < -game.images.get("bg-left").width && this.camera.vx < 0 && !this.timers.nextLevel.running) {
+	if (this.camera.x < -game.images.get("bg-left").width && this.camera.vx < 0) {
 		this.camera.x = -game.images.get("bg-left").width;
 		this.camera.vx = 0;
 		game.sounds.play("yay");
-		this.timers.nextLevel.start();
+		scene.nextLevel();
+		this.message = "Next waffle!";
+		this.timers.banner.reset();
+		this.timers.banner.start();
 	}
 
 	moveParticles(elapsedMillis, syrupParticles, true);
@@ -340,7 +345,6 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		return;
 	}
 
-	var scene = this;
 	var movingRight = this.camera.vx > 0;
 
 	function isOffScreen(entity) {
@@ -408,10 +412,15 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		return;
 	}
 
+	var scene = this;
 	this.camera.drawAbsolute(context, function() {
 		context.fillStyle = "#ffffff";
 		context.font = "100px lato";
 		centerText(context, Math.floor(score), 0, 100);
+		if (scene.timers.banner.running) {
+			context.fillStyle = "#000";
+			centerText(context, scene.message, 0, 600);
+		}
 		drawParticles(context, syrupParticles);
 	});
 }));
