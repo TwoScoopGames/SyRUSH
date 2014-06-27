@@ -7,10 +7,12 @@ var manifest = {
 		"logo": "images/logo.png",
 		"title-background": "images/title-background.png",
 		"start-button": "images/start-button.png",
-		"waffle-filled": "images/waffleFilled.png",
-		"waffle-hole": "images/waffleHole.png",
 		"sound-off": "images/sound-off-icon.png",
-		"sound-on": "images/sound-on-icon.png"
+		"sound-on": "images/sound-on-icon.png",
+		"waffle-hole": "images/waffle-hole.png",
+		"syrup-filled": "images/syrup-filled.png",
+		"butter-filled": "images/butter-filled.png",
+		"butter-syrup-filled": "images/butter-syrup-filled.png"
 	},
 	"sounds": {
 		"button": "sound/menuchange.wav",
@@ -44,16 +46,23 @@ var manifest = {
 			"repeatAt": 31
 		},
 		"syrup-anim": {
-			"strip": "images/syrup-anim.png",
-			"frames": 7,
+			"strip": "images/syrup-anim2.png",
+			"frames": 5,
 			"msPerFrame": 75,
-			"repeatAt": 6
+			"repeatAt": 4
+		},
+		"butter-anim": {
+			"strip": "images/waffleHole-butter-anim.png",
+			"frames": 4,
+			"msPerFrame": 75,
+			"repeatAt": 3
 		}
 	}
 };
 
 
 var game = new Splat.Game(canvas, manifest);
+var godmode = true;
 var score = 0;
 var best = Math.floor(getBest());
 var newBest = false;
@@ -61,7 +70,7 @@ var syrupParticles = [];
 var gravity = 0.2;
 var tileSize = 200;
 var fillSounds = ["pop1", "pop2", "pop3", "pop4", "pop5", "pop6", "pop7", "pop8"];
-var waffleWidth = 50;
+var waffleWidth = 10;
 
 
 function getBest() {
@@ -84,7 +93,7 @@ function drawCircle(context, color, radius, strokeColor, strokeSize, x, y) {
 	context.stroke();
 }
 
-function spray(mouse, velocity, radius, quantity) {
+function spray(mouse, color, velocity, radius, quantity) {
 	syrupParticles.length = 0;
 	for (var q = 0; q < quantity; q++) {
 		syrupParticles.push({
@@ -92,16 +101,20 @@ function spray(mouse, velocity, radius, quantity) {
 			y: mouse.y,
 			xv: (Math.random() - 0.5) * velocity,
 			yv: (Math.random() - 0.5) * velocity,
-			radius: Math.random() * radius
+			radius: Math.random() * radius,
+			color: color,
+			stroke: color
 		});
 
 	}
 }
 
+
+
 function drawParticles(context, particles) {
 	for (var i = 0; i < particles.length; i++) {
 		var particle = particles[i];
-		drawCircle(context, "#6d511f", particle.radius, "#2d1e05", 0, particle.x, particle.y);
+		drawCircle(context, particle.color, particle.radius, particle.stroke, 0, particle.x, particle.y);
 	}
 }
 
@@ -149,7 +162,7 @@ function drawScoreScreen(context, scene) {
 
 function makeSquare(x, y) {
 	var waffleHoleImage = game.images.get("waffle-hole");
-	var waffleFilledImage = game.images.get("waffle-filled");
+	var waffleFilledImage = game.images.get("syrup-filled");
 	var isFilled = false;
 	if (x < 800) {
 		isFilled = true;
@@ -190,6 +203,8 @@ function isInside(container, x, y) {
 		y >= container.y &&
 		y < container.y + container.height;
 }
+
+
 
 /*=========================================
 				 Scenes 
@@ -261,13 +276,17 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 
 	}));
 
+var level = 0;
+
 game.scenes.add("main", new Splat.Scene(canvas, function() {
+		console.log("init");
 		this.camera.x = -canvas.width;
 		this.camera.vx = 0.30;
 
-		var waffleFilledImage = game.images.get("waffle-filled");
-		var waffleHoleImage = game.images.get("waffle-hole");
-		this.squares = makeWaffle(waffleWidth, waffleFilledImage, waffleHoleImage);
+		var FilledSquare = game.images.get("butter-filled");
+		var goalSquare = game.images.get("waffle-hole");
+
+		this.squares = makeWaffle(waffleWidth, FilledSquare, goalSquare);
 
 		score = 0;
 		newBest = false;
@@ -276,16 +295,33 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		this.timers.fadeToBlack = new Splat.Timer(null, 1000, function() {
 			game.scenes.switchTo("game-title");
 		});
-
+		level++;
 
 	},
 	function simulation(elapsedMillis) {
-		var waffleFilledImage = game.animations.get("syrup-anim");
-		var waffleHoleImage = game.images.get("waffle-hole");
+
+		if (movingRight) {
+			var FilledSquare = game.images.get("butter-filled");
+			var goalSquare = game.images.get("waffle-hole");
+		} else {
+			var FilledSquare = game.images.get("butter-syrup-filled");
+			var goalSquare = game.images.get("butter-filled");
+		}
+
+
 		if (this.camera.x >= (waffleWidth * tileSize) && this.camera.vx > 0) {
-			console.log("switching directions");
+			console.log("switching directions, movingRight = ", movingRight);
 			this.camera.vx *= -1;
-			this.squares = makeWaffle(waffleWidth, waffleFilledImage, waffleHoleImage);
+			level++;
+			for (var i = 0; i < this.squares; i++) {
+				if (squares[i].filled) {
+
+					squares[i].sprite = game.images.get("butter-syrup-filled");
+				} else {
+					squares[i].sprite = game.images.get("butter-filled");
+				}
+			}
+			this.squares = makeWaffle(waffleWidth, FilledSquare, goalSquare);
 
 		}
 		moveParticles(elapsedMillis, syrupParticles, true);
@@ -297,8 +333,8 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		}
 
 		var scene = this;
-
 		var movingRight = this.camera.vx > 0;
+
 
 		function isOffScreen(entity) {
 			return movingRight ? entity.x + entity.width < scene.camera.x : entity.x > scene.camera.x + scene.camera.width;
@@ -313,17 +349,17 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 				break;
 			}
 			var last = this.squares.splice(currentSquareIndex, 1)[0];
-			console.log("last", last);
 			if (last.filled) {
-				if (last.x !== nextSquare.x) {
+				if (nextSquare !== undefined && last.x !== nextSquare.x) {
 					score++;
 				}
 			} else {
-				console.log("this.squares: ", this.squares);
-				game.sounds.play("gasp");
-				this.timers.fadeToBlack.start();
-				this.camera.vx = 0;
-				return;
+				if (!godmode) {
+					game.sounds.play("gasp");
+					this.timers.fadeToBlack.start();
+					this.camera.vx = 0;
+					return;
+				}
 			}
 		}
 
@@ -344,14 +380,26 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 					fillSound();
 
 					square.filled = true;
-					square.sprite = game.animations.get("syrup-anim").copy();
-					spray(game.mouse, 5, 25, 8);
-					console.log("click square: ", this.squares);
+
+					if (movingRight) {
+						square.sprite = game.animations.get("butter-anim").copy();
+						spray(game.mouse, "yellow", 5, 25, 8);
+					} else {
+						square.sprite = game.animations.get("syrup-anim").copy();
+						spray(game.mouse, "#6d511f", 5, 25, 8);
+					}
+
 				} else {
 
 					game.sounds.play("bad-tap");
 
-					spray(game.mouse, 5, 25, 100);
+					if (movingRight) {
+						spray(game.mouse, "yellow", 5, 25, 100);
+					} else {
+						spray(game.mouse, "#6d511f", 5, 25, 100);
+					}
+
+
 				}
 			}
 		}
