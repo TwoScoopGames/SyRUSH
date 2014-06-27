@@ -47,11 +47,11 @@ var manifest = {
 			"msPerFrame": 50,
 			"repeatAt": 31
 		},
-		"syrup-anim": {
-			"strip": "images/syrup-anim.png",
-			"frames": 5,
+		"butter-syrup-anim": {
+			"strip": "images/butter-syrup-anim.png",
+			"frames": 4,
 			"msPerFrame": 75,
-			"repeatAt": 4
+			"repeatAt": 3
 		},
 		"butter-anim": {
 			"strip": "images/butter-anim.png",
@@ -156,12 +156,7 @@ function drawScoreScreen(context, scene) {
 }
 
 function makeSquare(x, y, filledImage, emptyImage) {
-	var isFilled = false;
-	if (x < 800) {
-		isFilled = true;
-	} else {
-		isFilled = Math.random() > 0.5;
-	}
+	var isFilled = Math.random() > 0.5;
 
 	var image = isFilled ? filledImage : emptyImage;
 	var entity = new Splat.AnimatedEntity(x, y, tileSize, tileSize, image, 0, 0);
@@ -274,7 +269,7 @@ var levels = [
 	{
 		filledImage: "butter-syrup-filled",
 		emptyImage: "butter-filled",
-		fillAnim: "syrup-anim",
+		fillAnim: "butter-syrup-anim",
 		particleColor: "#6d511f",
 		width: 10,
 		speed: -0.30
