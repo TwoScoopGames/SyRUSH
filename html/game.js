@@ -284,7 +284,6 @@ function makeWaffleForLevel() {
 }
 
 game.scenes.add("main", new Splat.Scene(canvas, function() {
-	console.log("init");
 	this.camera.x = -canvas.width;
 	this.camera.vx = 0.30;
 
