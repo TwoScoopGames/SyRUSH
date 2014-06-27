@@ -13,7 +13,9 @@ var manifest = {
 		"waffle-hole": "images/waffle-hole.png",
 		"syrup-filled": "images/syrup-filled.png",
 		"butter-filled": "images/butter-filled.png",
-		"butter-syrup-filled": "images/butter-syrup-filled.png"
+		"butter-syrup-filled": "images/butter-syrup-filled.png",
+		"bg-left": "images/bg-left.png",
+		"bg-right": "images/bg-right.png"
 	},
 	"sounds": {
 		"button": "sound/menuchange.wav",
@@ -266,14 +268,16 @@ var levels = [
 		emptyImage: "waffle-hole",
 		fillAnim: "butter-anim",
 		particleColor: "yellow",
-		width: 10
+		width: 10,
+		speed: 0.30
 	},
 	{
 		filledImage: "butter-syrup-filled",
 		emptyImage: "butter-filled",
 		fillAnim: "syrup-anim",
 		particleColor: "#6d511f",
-		width: 10
+		width: 10,
+		speed: -0.30
 	}
 ];
 
@@ -284,22 +288,22 @@ function makeWaffleForLevel() {
 }
 
 game.scenes.add("main", new Splat.Scene(canvas, function() {
-	this.camera.x = -canvas.width;
-	this.camera.vx = 0.30;
-
-	level++;
-	this.squares = makeWaffleForLevel();
+	this.camera.x = -game.images.get("bg-left").width;
 
 	score = 0;
 	newBest = false;
+
+	level++;
+	this.camera.vx = levels[level].speed;
+	this.squares = makeWaffleForLevel();
 
 	this.timers.fadeToBlack = new Splat.Timer(null, 1000, function() {
 		game.scenes.switchTo("game-title");
 	});
 }, function(elapsedMillis) {
-	if (this.camera.x >= (waffleWidth * tileSize) && this.camera.vx > 0) {
-		this.camera.vx *= -1;
+	if (this.camera.x >= (levels[level].width * tileSize) + game.images.get("bg-right").width - canvas.width && this.camera.vx > 0) {
 		level++;
+		this.camera.vx = levels[level].speed;
 		this.squares = makeWaffleForLevel();
 	}
 	moveParticles(elapsedMillis, syrupParticles, true);
@@ -362,10 +366,10 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		}
 	}
 }, function(context) {
-	context.fillStyle = "#fff";
-	context.fillRect(-canvas.width, 0, canvas.width, canvas.height);
-	context.fillStyle = "#fff";
-	context.fillRect(waffleWidth * tileSize, 0, canvas.width, canvas.height);
+	var bg = game.images.get("bg-left");
+	context.drawImage(bg, -bg.width, 0);
+	bg = game.images.get("bg-right");
+	context.drawImage(bg, levels[level].width * tileSize, 0);
 
 	for (var i = 0; i < this.squares.length; i++) {
 		this.squares[i].draw(context);
