@@ -268,10 +268,10 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 	this.camera.x = -canvas.width;
 	this.camera.vx = 0.30;
 
-	var FilledSquare = game.images.get("butter-filled");
+	var filledSquare = game.images.get("butter-filled");
 	var goalSquare = game.images.get("waffle-hole");
 
-	this.squares = makeWaffle(waffleWidth, FilledSquare, goalSquare);
+	this.squares = makeWaffle(waffleWidth, filledSquare, goalSquare);
 
 	score = 0;
 	newBest = false;
@@ -282,10 +282,10 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 	level++;
 }, function(elapsedMillis) {
 	if (movingRight) {
-		var FilledSquare = game.images.get("butter-filled");
+		var filledSquare = game.images.get("butter-filled");
 		var goalSquare = game.images.get("waffle-hole");
 	} else {
-		var FilledSquare = game.images.get("butter-syrup-filled");
+		var filledSquare = game.images.get("butter-syrup-filled");
 		var goalSquare = game.images.get("butter-filled");
 	}
 
@@ -301,8 +301,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 				squares[i].sprite = game.images.get("butter-filled");
 			}
 		}
-		this.squares = makeWaffle(waffleWidth, FilledSquare, goalSquare);
-
+		this.squares = makeWaffle(waffleWidth, filledSquare, goalSquare);
 	}
 	moveParticles(elapsedMillis, syrupParticles, true);
 	var waffleFilledImage = game.animations.get("syrup-anim");
