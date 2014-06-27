@@ -1,4 +1,5 @@
 "use strict";
+
 var canvas = document.getElementById("canvas");
 
 var manifest = {
@@ -28,7 +29,6 @@ var manifest = {
 		"pop6": "sound/pop6.wav",
 		"pop7": "sound/pop7.wav",
 		"pop8": "sound/pop8.wav"
-
 	},
 	"fonts": {
 		"lato": {
@@ -60,7 +60,6 @@ var manifest = {
 	}
 };
 
-
 var game = new Splat.Game(canvas, manifest);
 var godmode = true;
 var score = 0;
@@ -72,7 +71,6 @@ var tileSize = 200;
 var fillSounds = ["pop1", "pop2", "pop3", "pop4", "pop5", "pop6", "pop7", "pop8"];
 var waffleWidth = 10;
 
-
 function getBest() {
 	var b = parseInt(Splat.saveData.get("bestScore"));
 	if (isNaN(b) || b < 0 || !b) {
@@ -80,8 +78,6 @@ function getBest() {
 	}
 	return b;
 }
-
-
 
 function drawCircle(context, color, radius, strokeColor, strokeSize, x, y) {
 	context.beginPath();
@@ -105,11 +101,8 @@ function spray(mouse, color, velocity, radius, quantity) {
 			color: color,
 			stroke: color
 		});
-
 	}
 }
-
-
 
 function drawParticles(context, particles) {
 	for (var i = 0; i < particles.length; i++) {
@@ -204,11 +197,9 @@ function isInside(container, x, y) {
 		y < container.y + container.height;
 }
 
-
-
 /*=========================================
-				 Scenes 
-===========================================*/
+  Scenes 
+  ===========================================*/
 
 game.scenes.add("title", new Splat.Scene(canvas, function() {
 	this.timers.running = new Splat.Timer(null, 1, function() {
@@ -230,209 +221,185 @@ game.scenes.add("title", new Splat.Scene(canvas, function() {
 
 game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 
-	}, function(elapsedMillis) {
-
-		if (game.mouse.consumePressed(0, (canvas.width - 115), 100, 115, 109)) {
-			game.sounds.muted = !game.sounds.muted;
-			if (game.sounds.muted) {
-				game.sounds.stop("music");
-			}
+}, function(elapsedMillis) {
+	if (game.mouse.consumePressed(0, (canvas.width - 115), 100, 115, 109)) {
+		game.sounds.muted = !game.sounds.muted;
+		if (game.sounds.muted) {
+			game.sounds.stop("music");
 		}
-		if (game.mouse.consumePressed(0)) {
-			game.sounds.play("button");
-			game.sounds.play("music", true);
-			game.scenes.switchTo("main");
+	}
+	if (game.mouse.consumePressed(0)) {
+		game.sounds.play("button");
+		game.sounds.play("music", true);
+		game.scenes.switchTo("main");
+	}
+}, function(context) {
+	this.camera.drawAbsolute(context, function() {
+		var titleBackground = game.images.get("title-background");
+		context.drawImage(titleBackground, 0, 0);
+
+		var logo = game.images.get("logo");
+		context.drawImage(logo, (canvas.width / 2) - (logo.width / 2), 200);
+
+		var startButton = game.images.get("start-button");
+		context.drawImage(startButton, (canvas.width / 2) - (startButton.width / 2), 700);
+
+		context.fillStyle = "#fff";
+		context.font = "50px lato";
+		centerText(context, "Music by Glass Boy", 0, canvas.height - 60);
+
+		var adPlaceholder = game.images.get("ad-placeholder");
+		context.drawImage(adPlaceholder, 0, 0);
+
+		var soundSwitch;
+		if (game.sounds.muted) {
+			soundSwitch = game.images.get("sound-off");
+		} else {
+			soundSwitch = game.images.get("sound-on");
 		}
-	},
-	function(context) {
-		this.camera.drawAbsolute(context, function() {
-
-			var titleBackground = game.images.get("title-background");
-			context.drawImage(titleBackground, 0, 0);
-
-			var logo = game.images.get("logo");
-			context.drawImage(logo, (canvas.width / 2) - (logo.width / 2), 200);
-
-			var startButton = game.images.get("start-button");
-			context.drawImage(startButton, (canvas.width / 2) - (startButton.width / 2), 700);
-
-			context.fillStyle = "#fff";
-			context.font = "50px lato";
-			centerText(context, "Music by Glass Boy", 0, canvas.height - 60);
-
-			var adPlaceholder = game.images.get("ad-placeholder");
-			context.drawImage(adPlaceholder, 0, 0);
-
-			var soundSwitch;
-			if (game.sounds.muted) {
-				soundSwitch = game.images.get("sound-off");
-			} else {
-				soundSwitch = game.images.get("sound-on");
-			}
-			context.drawImage(soundSwitch, (canvas.width - soundSwitch.width), 100);
-
-		});
-
-
-	}));
+		context.drawImage(soundSwitch, (canvas.width - soundSwitch.width), 100);
+	});
+}));
 
 var level = 0;
 
 game.scenes.add("main", new Splat.Scene(canvas, function() {
-		console.log("init");
-		this.camera.x = -canvas.width;
-		this.camera.vx = 0.30;
+	console.log("init");
+	this.camera.x = -canvas.width;
+	this.camera.vx = 0.30;
 
+	var FilledSquare = game.images.get("butter-filled");
+	var goalSquare = game.images.get("waffle-hole");
+
+	this.squares = makeWaffle(waffleWidth, FilledSquare, goalSquare);
+
+	score = 0;
+	newBest = false;
+
+	this.timers.fadeToBlack = new Splat.Timer(null, 1000, function() {
+		game.scenes.switchTo("game-title");
+	});
+	level++;
+}, function(elapsedMillis) {
+	if (movingRight) {
 		var FilledSquare = game.images.get("butter-filled");
 		var goalSquare = game.images.get("waffle-hole");
+	} else {
+		var FilledSquare = game.images.get("butter-syrup-filled");
+		var goalSquare = game.images.get("butter-filled");
+	}
 
+	if (this.camera.x >= (waffleWidth * tileSize) && this.camera.vx > 0) {
+		console.log("switching directions, movingRight = ", movingRight);
+		this.camera.vx *= -1;
+		level++;
+		for (var i = 0; i < this.squares; i++) {
+			if (squares[i].filled) {
+
+				squares[i].sprite = game.images.get("butter-syrup-filled");
+			} else {
+				squares[i].sprite = game.images.get("butter-filled");
+			}
+		}
 		this.squares = makeWaffle(waffleWidth, FilledSquare, goalSquare);
 
-		score = 0;
-		newBest = false;
+	}
+	moveParticles(elapsedMillis, syrupParticles, true);
+	var waffleFilledImage = game.animations.get("syrup-anim");
 
+	if (this.timers.fadeToBlack.running) {
+		return;
+	}
 
-		this.timers.fadeToBlack = new Splat.Timer(null, 1000, function() {
-			game.scenes.switchTo("game-title");
-		});
-		level++;
+	var scene = this;
+	var movingRight = this.camera.vx > 0;
 
-	},
-	function simulation(elapsedMillis) {
+	function isOffScreen(entity) {
+		return movingRight ? entity.x + entity.width < scene.camera.x : entity.x > scene.camera.x + scene.camera.width;
+	}
 
-		if (movingRight) {
-			var FilledSquare = game.images.get("butter-filled");
-			var goalSquare = game.images.get("waffle-hole");
+	while (this.squares.length > 0) {
+		var currentSquareIndex = movingRight ? 0 : this.squares.length - 1;
+		var nextSquareIndex = movingRight ? 1 : this.squares.length - 2;
+		var nextSquare = this.squares[nextSquareIndex];
+		var isSquareOffScreen = isOffScreen(this.squares[currentSquareIndex]);
+		if (!isSquareOffScreen) {
+			break;
+		}
+		var last = this.squares.splice(currentSquareIndex, 1)[0];
+		if (last.filled) {
+			if (nextSquare !== undefined && last.x !== nextSquare.x) {
+				score++;
+			}
 		} else {
-			var FilledSquare = game.images.get("butter-syrup-filled");
-			var goalSquare = game.images.get("butter-filled");
+			if (!godmode) {
+				game.sounds.play("gasp");
+				this.timers.fadeToBlack.start();
+				this.camera.vx = 0;
+				return;
+			}
 		}
+	}
 
+	for (var i = 0; i < this.squares.length; i++) {
+		var square = this.squares[i];
+		square.move(elapsedMillis);
+		for (var t = 0; t < game.mouse.touches.length; t++) {
+			var touch = game.mouse.touches[t];
+			if (touch.consumed) {
+				continue;
+			}
+			if (!isInside(square, touch.x + this.camera.x, touch.y)) {
+				continue;
+			}
+			touch.consumed = true;
+			if (!square.filled) {
 
-		if (this.camera.x >= (waffleWidth * tileSize) && this.camera.vx > 0) {
-			console.log("switching directions, movingRight = ", movingRight);
-			this.camera.vx *= -1;
-			level++;
-			for (var i = 0; i < this.squares; i++) {
-				if (squares[i].filled) {
+				fillSound();
 
-					squares[i].sprite = game.images.get("butter-syrup-filled");
+				square.filled = true;
+
+				if (movingRight) {
+					square.sprite = game.animations.get("butter-anim").copy();
+					spray(game.mouse, "yellow", 5, 25, 8);
 				} else {
-					squares[i].sprite = game.images.get("butter-filled");
+					square.sprite = game.animations.get("syrup-anim").copy();
+					spray(game.mouse, "#6d511f", 5, 25, 8);
 				}
-			}
-			this.squares = makeWaffle(waffleWidth, FilledSquare, goalSquare);
 
-		}
-		moveParticles(elapsedMillis, syrupParticles, true);
-		var waffleFilledImage = game.animations.get("syrup-anim");
-
-
-		if (this.timers.fadeToBlack.running) {
-			return;
-		}
-
-		var scene = this;
-		var movingRight = this.camera.vx > 0;
-
-
-		function isOffScreen(entity) {
-			return movingRight ? entity.x + entity.width < scene.camera.x : entity.x > scene.camera.x + scene.camera.width;
-		}
-
-		while (this.squares.length > 0) {
-			var currentSquareIndex = movingRight ? 0 : this.squares.length - 1;
-			var nextSquareIndex = movingRight ? 1 : this.squares.length - 2;
-			var nextSquare = this.squares[nextSquareIndex];
-			var isSquareOffScreen = isOffScreen(this.squares[currentSquareIndex]);
-			if (!isSquareOffScreen) {
-				break;
-			}
-			var last = this.squares.splice(currentSquareIndex, 1)[0];
-			if (last.filled) {
-				if (nextSquare !== undefined && last.x !== nextSquare.x) {
-					score++;
-				}
 			} else {
-				if (!godmode) {
-					game.sounds.play("gasp");
-					this.timers.fadeToBlack.start();
-					this.camera.vx = 0;
-					return;
-				}
-			}
-		}
 
-		for (var i = 0; i < this.squares.length; i++) {
-			var square = this.squares[i];
-			square.move(elapsedMillis);
-			for (var t = 0; t < game.mouse.touches.length; t++) {
-				var touch = game.mouse.touches[t];
-				if (touch.consumed) {
-					continue;
-				}
-				if (!isInside(square, touch.x + this.camera.x, touch.y)) {
-					continue;
-				}
-				touch.consumed = true;
-				if (!square.filled) {
+				game.sounds.play("bad-tap");
 
-					fillSound();
-
-					square.filled = true;
-
-					if (movingRight) {
-						square.sprite = game.animations.get("butter-anim").copy();
-						spray(game.mouse, "yellow", 5, 25, 8);
-					} else {
-						square.sprite = game.animations.get("syrup-anim").copy();
-						spray(game.mouse, "#6d511f", 5, 25, 8);
-					}
-
+				if (movingRight) {
+					spray(game.mouse, "yellow", 5, 25, 100);
 				} else {
-
-					game.sounds.play("bad-tap");
-
-					if (movingRight) {
-						spray(game.mouse, "yellow", 5, 25, 100);
-					} else {
-						spray(game.mouse, "#6d511f", 5, 25, 100);
-					}
-
-
+					spray(game.mouse, "#6d511f", 5, 25, 100);
 				}
 			}
 		}
+	}
+}, function(context) {
+	context.fillStyle = "#fff";
+	context.fillRect(-canvas.width, 0, canvas.width, canvas.height);
+	context.fillStyle = "#fff";
+	context.fillRect(waffleWidth * tileSize, 0, canvas.width, canvas.height);
 
+	for (var i = 0; i < this.squares.length; i++) {
+		this.squares[i].draw(context);
+	}
 
+	if (this.timers.fadeToBlack.running) {
+		drawScoreScreen(context, this);
+		return;
+	}
 
-	},
-
-	function draw(context) {
-
-		context.fillStyle = "#fff";
-		context.fillRect(-canvas.width, 0, canvas.width, canvas.height);
-		context.fillStyle = "#fff";
-		context.fillRect(waffleWidth * tileSize, 0, canvas.width, canvas.height);
-
-		for (var i = 0; i < this.squares.length; i++) {
-			this.squares[i].draw(context);
-		}
-
-		if (this.timers.fadeToBlack.running) {
-			drawScoreScreen(context, this);
-			return;
-		}
-
-
-		this.camera.drawAbsolute(context, function() {
-			context.fillStyle = "#ffffff";
-			context.font = "100px lato";
-			centerText(context, Math.floor(score), 0, 100);
-			drawParticles(context, syrupParticles);
-		});
-
-
-	}));
+	this.camera.drawAbsolute(context, function() {
+		context.fillStyle = "#ffffff";
+		context.font = "100px lato";
+		centerText(context, Math.floor(score), 0, 100);
+		drawParticles(context, syrupParticles);
+	});
+}));
 
 game.scenes.switchTo("loading");
