@@ -5,17 +5,21 @@ var canvas = document.getElementById("canvas");
 var manifest = {
 	"images": {
 		"ad-placeholder": "images/ad-placeholder.png",
-		"logo": "images/logo.png",
-		"title-background": "images/title-background.png",
-		"start-button": "images/start-button.png",
-		"sound-off": "images/sound-off-icon.png",
-		"sound-on": "images/sound-on-icon.png",
-		"waffle-hole": "images/waffle-hole.png",
-		"syrup-filled": "images/syrup-filled.png",
+		"berries-cream-filled": "images/berries-cream-filled.png",
+		"berry-filled": "images/berry-filled.png",
+		"berry-filled-2": "images/berry-filled-2.png",
+		"berry-filled-3": "images/berry-filled-3.png",
+		"bg-left": "images/bg-left.png",
+		"bg-right": "images/bg-right.png",
 		"butter-filled": "images/butter-filled.png",
 		"butter-syrup-filled": "images/butter-syrup-filled.png",
-		"bg-left": "images/bg-left.png",
-		"bg-right": "images/bg-right.png"
+		"logo": "images/logo.png",
+		"sound-off": "images/sound-off-icon.png",
+		"sound-on": "images/sound-on-icon.png",
+		"start-button": "images/start-button.png",
+		"syrup-filled": "images/syrup-filled.png",
+		"title-background": "images/title-background.png",
+		"waffle-hole": "images/waffle-hole.png",
 	},
 	"sounds": {
 		"button": "sound/menuchange.wav",
@@ -41,14 +45,14 @@ var manifest = {
 		}
 	},
 	"animations": {
-		"two-scoop": {
-			"strip": "images/two-scoop-anim.png",
-			"frames": 32,
-			"msPerFrame": 50,
-			"repeatAt": 31
+		"berries-cream-anim": {
+			"strip": "images/berries-cream-anim.png",
+			"frames": 3,
+			"msPerFrame": 75,
+			"repeatAt": 2
 		},
-		"butter-syrup-anim": {
-			"strip": "images/butter-syrup-anim.png",
+		"berry-anim": {
+			"strip": "images/berry-anim.png",
 			"frames": 4,
 			"msPerFrame": 75,
 			"repeatAt": 3
@@ -58,7 +62,27 @@ var manifest = {
 			"frames": 4,
 			"msPerFrame": 75,
 			"repeatAt": 3
-		}
+		},
+		"butter-syrup-anim": {
+			"strip": "images/butter-syrup-anim.png",
+			"frames": 4,
+			"msPerFrame": 75,
+			"repeatAt": 3
+		},
+		"syrup-anim": {
+			"strip": "images/syrup-anim.png",
+			"frames": 4,
+			"msPerFrame": 75,
+			"repeatAt": 3
+		},
+		"two-scoop": {
+			"strip": "images/two-scoop-anim.png",
+			"frames": 32,
+			"msPerFrame": 50,
+			"repeatAt": 31
+		},
+
+
 	}
 };
 
@@ -257,40 +281,63 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 }));
 
 var level = -1;
-var levels = [
-	{
-		filledImage: "butter-filled",
-		emptyImage: "waffle-hole",
-		fillAnim: "butter-anim",
-		particleColor: "yellow",
-		width: 10,
-		speed: 0.30
-	},
-	{
-		filledImage: "butter-syrup-filled",
-		emptyImage: "butter-filled",
-		fillAnim: "butter-syrup-anim",
-		particleColor: "#6d511f",
-		width: 10,
-		speed: -0.30
-	},
-	{
-		filledImage: "butter-filled",
-		emptyImage: "waffle-hole",
-		fillAnim: "butter-anim",
-		particleColor: "yellow",
-		width: 10,
-		speed: 0.50
-	},
-	{
-		filledImage: "butter-syrup-filled",
-		emptyImage: "butter-filled",
-		fillAnim: "butter-syrup-anim",
-		particleColor: "#6d511f",
-		width: 10,
-		speed: -0.50
-	}
-];
+var levels = [{
+	filledImage: "butter-filled",
+	emptyImage: "waffle-hole",
+	fillAnim: "butter-anim",
+	particleColor: "yellow",
+	width: 10,
+	speed: 0.30
+}, {
+	filledImage: "butter-syrup-filled",
+	emptyImage: "butter-filled",
+	fillAnim: "butter-syrup-anim",
+	particleColor: "#6d511f",
+	width: 10,
+	speed: -0.30
+}, {
+	filledImage: "butter-filled",
+	emptyImage: "waffle-hole",
+	fillAnim: "butter-anim",
+	particleColor: "yellow",
+	width: 10,
+	speed: 0.50
+}, {
+	filledImage: "butter-syrup-filled",
+	emptyImage: "butter-filled",
+	fillAnim: "butter-syrup-anim",
+	particleColor: "#6d511f",
+	width: 10,
+	speed: -0.50
+}, {
+	filledImage: "berry-filled-3",
+	emptyImage: "waffle-hole",
+	fillAnim: "berry-anim",
+	particleColor: "rgba(0,0,0,0)",
+	width: 10,
+	speed: 0.50
+}, {
+	filledImage: "berries-cream-filled",
+	emptyImage: "berry-filled-3",
+	fillAnim: "berries-cream-anim",
+	particleColor: "rgba(255,255,255,1)",
+	width: 10,
+	speed: -0.50
+}, {
+	filledImage: "berry-filled-3",
+	emptyImage: "waffle-hole",
+	fillAnim: "berry-anim",
+	particleColor: "rgba(0,0,0,0)",
+	width: 10,
+	speed: 0.50
+}, {
+	filledImage: "berries-cream-filled",
+	emptyImage: "berry-filled-3",
+	fillAnim: "berries-cream-anim",
+	particleColor: "rgba(255,255,255,1)",
+	width: 10,
+	speed: -0.50
+}];
 
 function makeWaffleForLevel() {
 	var filledSquare = game.images.get(levels[level].filledImage);
