@@ -400,6 +400,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 	this.nextLevel();
 
 	this.timers.fadeToBlack = new Splat.Timer(null, 1000, function() {
+		level = -1;
 		game.scenes.switchTo("game-title");
 	});
 	var scene = this;
