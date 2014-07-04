@@ -497,6 +497,9 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		}
 	}
 }, function(context) {
+	if (level < 0) {
+		return;
+	}
 	var bg = game.images.get("bg-left");
 	context.drawImage(bg, -bg.width, 0);
 	bg = game.images.get("bg-right");
