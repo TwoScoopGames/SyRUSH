@@ -326,9 +326,9 @@ function butterSyrup(width, speed) {
 
 function berriesOnly(width, speed) {
 	return {
-		filledImage: "berries-filled",
+		filledImage: "berry-filled-3",
 		emptyImage: "waffle-hole",
-		fillAnim: "berries-anim",
+		fillAnim: "berry-anim",
 		particleColor: "rgba(255,255,255,1)",
 		width: width,
 		speed: speed
@@ -339,7 +339,7 @@ function berriesCream(width, speed) {
 	return {
 		emptyImage: "berry-filled-3",
 		fillAnim: "berries-cream-anim",
-		particleColor: "rgba(255,255,255,1)",
+		particleColor: "rgba(255,255,255,0)",
 		width: width,
 		speed: speed
 	};
