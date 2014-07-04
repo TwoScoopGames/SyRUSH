@@ -71,9 +71,9 @@ var manifest = {
 		},
 		"syrup-anim": {
 			"strip": "images/syrup-anim.png",
-			"frames": 4,
+			"frames": 5,
 			"msPerFrame": 75,
-			"repeatAt": 3
+			"repeatAt": 4
 		},
 		"two-scoop": {
 			"strip": "images/two-scoop-anim.png",
@@ -81,7 +81,18 @@ var manifest = {
 			"msPerFrame": 50,
 			"repeatAt": 31
 		},
-
+		"next-waffle-anim": {
+			"strip": "images/next-waffle-anim.png",
+			"frames": 8,
+			"msPerFrame": 50,
+			"repeatAt": 7
+		},
+		"next-topping-anim": {
+			"strip": "images/next-topping-anim.png",
+			"frames": 7,
+			"msPerFrame": 50,
+			"repeatAt": 6
+		},
 
 	}
 };
@@ -280,64 +291,84 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	});
 }));
 
+function butterOnly(width, speed) {
+	return {
+		filledImage: "butter-filled",
+		emptyImage: "waffle-hole",
+		fillAnim: "butter-anim",
+		particleColor: "yellow",
+		width: width,
+		speed: speed
+	};
+}
+
+function syrupOnly(width, speed) {
+	return {
+		filledImage: "syrup-filled",
+		emptyImage: "waffle-hole",
+		fillAnim: "syrup-anim",
+		particleColor: "#6d511f",
+		width: width,
+		speed: speed
+	};
+}
+
+function butterSyrup(width, speed) {
+	return {
+		filledImage: "butter-syrup-filled",
+		emptyImage: "butter-filled",
+		fillAnim: "butter-syrup-anim",
+		particleColor: "#6d511f",
+		width: width,
+		speed: speed
+	};
+}
+
+function berriesOnly(width, speed) {
+	return {
+		filledImage: "berries-filled",
+		emptyImage: "waffle-hole",
+		fillAnim: "berries-anim",
+		particleColor: "rgba(255,255,255,1)",
+		width: width,
+		speed: speed
+	};
+}
+
+function berriesCream(width, speed) {
+	return {
+		emptyImage: "berry-filled-3",
+		fillAnim: "berries-cream-anim",
+		particleColor: "rgba(255,255,255,1)",
+		width: width,
+		speed: speed
+	};
+}
+
+function randomIntBetween(min, max) {
+	return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+var minWidth = 20;
+var maxWidth = 40;
+var speed = 0.20;
 var level = -1;
-var levels = [{
-	filledImage: "butter-filled",
-	emptyImage: "waffle-hole",
-	fillAnim: "butter-anim",
-	particleColor: "yellow",
-	width: 10,
-	speed: 0.30
-}, {
-	filledImage: "butter-syrup-filled",
-	emptyImage: "butter-filled",
-	fillAnim: "butter-syrup-anim",
-	particleColor: "#6d511f",
-	width: 10,
-	speed: -0.30
-}, {
-	filledImage: "butter-filled",
-	emptyImage: "waffle-hole",
-	fillAnim: "butter-anim",
-	particleColor: "yellow",
-	width: 10,
-	speed: 0.50
-}, {
-	filledImage: "butter-syrup-filled",
-	emptyImage: "butter-filled",
-	fillAnim: "butter-syrup-anim",
-	particleColor: "#6d511f",
-	width: 10,
-	speed: -0.50
-}, {
-	filledImage: "berry-filled-3",
-	emptyImage: "waffle-hole",
-	fillAnim: "berry-anim",
-	particleColor: "rgba(0,0,0,0)",
-	width: 10,
-	speed: 0.50
-}, {
-	filledImage: "berries-cream-filled",
-	emptyImage: "berry-filled-3",
-	fillAnim: "berries-cream-anim",
-	particleColor: "rgba(255,255,255,1)",
-	width: 10,
-	speed: -0.50
-}, {
-	filledImage: "berry-filled-3",
-	emptyImage: "waffle-hole",
-	fillAnim: "berry-anim",
-	particleColor: "rgba(0,0,0,0)",
-	width: 10,
-	speed: 0.50
-}, {
-	filledImage: "berries-cream-filled",
-	emptyImage: "berry-filled-3",
-	fillAnim: "berries-cream-anim",
-	particleColor: "rgba(255,255,255,1)",
-	width: 10,
-	speed: -0.50
-}];
+var levels = [
+	//syrupOnly(randomIntBetween(1, 2), speed),
+	//butterOnly(randomIntBetween(2, 3), -speed),
+	//syrupOnly(randomIntBetween(minWidth, maxWidth), speed),
+	//butterOnly(randomIntBetween(minWidth, maxWidth), -speed),
+	//butterSyrup(randomIntBetween(minWidth, maxWidth), speed),
+	//berriesOnly(randomIntBetween(minWidth, maxWidth), -speed),
+	//berriesCream(randomIntBetween(minWidth, maxWidth), speed),
+	berriesOnly(randomIntBetween(minWidth, maxWidth), speed),
+	berriesOnly(randomIntBetween(minWidth, maxWidth), -speed),
+	//berriesCream(randomIntBetween(minWidth, maxWidth), speed)
+];
+
+function isOdd(num) {
+	return num % 2;
+}
 
 function makeWaffleForLevel() {
 	var filledSquare = game.images.get(levels[level].filledImage);
@@ -346,6 +377,7 @@ function makeWaffleForLevel() {
 }
 
 game.scenes.add("main", new Splat.Scene(canvas, function() {
+
 	this.camera.x = -game.images.get("bg-left").width;
 
 	score = 0;
@@ -358,7 +390,11 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 			game.scenes.switchTo("game-title");
 			return;
 		}
+
 		this.camera.vx = levels[level].speed;
+
+
+
 		this.squares = makeWaffleForLevel();
 	}.bind(this);
 	this.nextLevel();
@@ -367,8 +403,23 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		game.scenes.switchTo("game-title");
 	});
 	var scene = this;
-	this.timers.banner = new Splat.Timer(null, 1000, null);
+
+	this.timers.banner = new Splat.Timer(null, 1000, function() {
+		scene.message = "";
+	});
+
 }, function(elapsedMillis) {
+	var nextTopping = game.animations.get("next-topping-anim");
+	var nextWaffle = game.animations.get("next-waffle-anim");
+	nextWaffle.move(elapsedMillis);
+	nextTopping.move(elapsedMillis);
+	if (this.message != "Next waffle!") {
+		nextWaffle.reset();
+	}
+	if (this.message != "Next topping!") {
+		nextTopping.reset();
+	}
+
 	var scene = this;
 	if (this.camera.x >= (levels[level].width * tileSize) + game.images.get("bg-right").width - canvas.width && this.camera.vx > 0) {
 		this.message = "Next topping!";
@@ -441,6 +492,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 			} else {
 				game.sounds.play("bad-tap");
 				spray(game.mouse, levels[level].particleColor, 5, 25, 100);
+				speed += 0.05;
 			}
 		}
 	}
@@ -464,11 +516,18 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		context.fillStyle = "#ffffff";
 		context.font = "100px lato";
 		centerText(context, Math.floor(score), 0, 100);
-		if (scene.timers.banner.running) {
-			context.fillStyle = "#000";
-			centerText(context, scene.message, 0, 600);
-		}
 		drawParticles(context, syrupParticles);
+		if (scene.message === "Next waffle!") {
+			console.log("Next waffle!");
+			var nextWaffle = game.animations.get("next-waffle-anim");
+			nextWaffle.draw(context, (canvas.width / 2) - (nextWaffle.width / 2), (canvas.height / 2) - (nextWaffle.height / 2));
+		}
+		if (scene.message === "Next topping!") {
+			console.log("Next topping!");
+			var nextTopping = game.animations.get("next-topping-anim");
+			nextTopping.draw(context, (canvas.width / 2) - (nextTopping.width / 2), 0);
+		}
+
 	});
 }));
 
