@@ -101,15 +101,13 @@ var manifest = {
 
 var game = new Splat.Game(canvas, manifest);
 var godmode = false;
-var score = 0;
-var best = 0;
-var newBest = false;
 var syrupParticles = [];
 var gravity = 0.2;
 var tileSize = 200;
 var fillSounds = ["pop1", "pop2", "pop3", "pop4", "pop5", "pop6", "pop7", "pop8"];
 var waffleWidth = 10;
 
+var best = 0;
 function getBest() {
 	Splat.saveData.get("bestScore", function(err, data) {
 		if (!err) {
@@ -186,9 +184,9 @@ function drawScoreScreen(context, scene) {
 		context.font = "50px lato";
 		centerText(context, "SCORE", 0, 300);
 		context.font = "100px lato";
-		centerText(context, score, 0, 400);
+		centerText(context, scene.score, 0, 400);
 		context.font = "50px lato";
-		if (newBest) {
+		if (scene.newBest) {
 			context.fillStyle = "#be4682";
 			centerText(context, "NEW BEST!", 0, 600);
 		} else {
@@ -357,8 +355,8 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 
 	this.camera.x = -game.images.get("bg-left").width;
 
-	score = 0;
-	newBest = false;
+	this.score = 0;
+	this.newBest = false;
 	this.message = "";
 	levels = [];
 
@@ -436,10 +434,10 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		var last = this.squares.splice(currentSquareIndex, 1)[0];
 		if (last.filled) {
 			if (nextSquare !== undefined && last.x !== nextSquare.x) {
-				score++;
-				if (score > best) {
-					best = score;
-					newBest = true;
+				this.score++;
+				if (this.score > best) {
+					best = this.score;
+					this.newBest = true;
 					setBest();
 				}
 			}
@@ -504,7 +502,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 	this.camera.drawAbsolute(context, function() {
 		context.fillStyle = "#ffffff";
 		context.font = "100px lato";
-		centerText(context, Math.floor(score), 0, 100);
+		centerText(context, scene.score, 0, 100);
 		drawParticles(context, syrupParticles);
 		if (scene.message === "Next waffle!") {
 			var nextWaffle = game.animations.get("next-waffle-anim");
