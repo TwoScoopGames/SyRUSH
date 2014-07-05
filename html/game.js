@@ -7,10 +7,10 @@ canvas.width = window.innerWidth * (canvas.height / window.innerHeight);
 var manifest = {
 	"images": {
 		"ad-placeholder": "images/ad-placeholder.png",
-		"berries-cream-filled": "images/blueberry-cream-filled.png",
-		"berry-filled": "images/blueberry-filled.png",
-		"berry-filled-2": "images/blueberry-filled-2.png",
-		"berry-filled-3": "images/blueberry-filled-3.png",
+		"blueberry-cream-filled": "images/blueberry-cream-filled.png",
+		"blueberry-filled": "images/blueberry-filled.png",
+		"blueberry-filled-2": "images/blueberry-filled-2.png",
+		"blueberry-filled-3": "images/blueberry-filled-3.png",
 		"bg-left": "images/bg-left.png",
 		"bg-right": "images/bg-right.png",
 		"butter-filled": "images/butter-filled.png",
@@ -47,13 +47,13 @@ var manifest = {
 		}
 	},
 	"animations": {
-		"berries-cream-anim": {
+		"blueberry-cream-anim": {
 			"strip": "images/blueberry-cream-anim.png",
 			"frames": 3,
 			"msPerFrame": 75,
 			"repeatAt": 2
 		},
-		"berry-anim": {
+		"blueberry-anim": {
 			"strip": "images/blueberry-anim.png",
 			"frames": 4,
 			"msPerFrame": 75,
@@ -323,8 +323,8 @@ function makeLevel(filledImage, emptyImage, fillAnim, particleColor, width, spee
 var butterOnly = makeLevel.bind(undefined, "butter-filled", "waffle-hole", "butter-anim", "yellow");
 var syrupOnly = makeLevel.bind(undefined, "syrup-filled", "waffle-hole", "syrup-anim", "#6d511f");
 var butterSyrup = makeLevel.bind(undefined, "butter-syrup-filled", "butter-filled", "butter-syrup-anim", "#6d511f");
-var berriesOnly = makeLevel.bind(undefined, "berry-filled-3", "waffle-hole", "berry-anim", "rgba(255,255,255,1)");
-var berriesCream = makeLevel.bind(undefined, "berries-cream-filled", "berry-filled-3", "berries-cream-anim", "rgba(255,255,255,0)");
+var berriesOnly = makeLevel.bind(undefined, "blueberry-filled-3", "waffle-hole", "blueberry-anim", "rgba(255,255,255,1)");
+var berriesCream = makeLevel.bind(undefined, "blueberry-cream-filled", "blueberry-filled-3", "blueberry-cream-anim", "rgba(255,255,255,0)");
 
 function randomIntBetween(min, max) {
 	return Math.floor(Math.random() * (max - min + 1) + min);
