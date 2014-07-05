@@ -138,12 +138,12 @@ Particles.prototype.draw = function(context) {
 		drawCircle(context, particle.color, particle.radius, particle.stroke, 0, particle.x, particle.y);
 	}
 };
-Particles.prototype.spray = function(mouse, color, velocity, radius, quantity) {
+Particles.prototype.spray = function(x, y, color, velocity, radius, quantity) {
 	this.particles = [];
 	for (var q = 0; q < quantity; q++) {
 		this.particles.push({
-			x: mouse.x,
-			y: mouse.y,
+			x: x,
+			y: y,
 			vx: (Math.random() - 0.5) * velocity,
 			vy: (Math.random() - 0.5) * velocity,
 			radius: Math.random() * radius,
@@ -465,10 +465,10 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 				fillSound();
 				square.filled = true;
 				square.sprite = game.animations.get(levels[level].fillAnim).copy();
-				particles.spray(game.mouse, levels[level].particleColor, 5, 25, 8);
+				particles.spray(game.mouse.x, game.mouse.y, levels[level].particleColor, 5, 25, 8);
 			} else {
 				game.sounds.play("bad-tap");
-				particles.spray(game.mouse, levels[level].particleColor, 5, 25, 100);
+				particles.spray(game.mouse.x, game.mouse.y, levels[level].particleColor, 5, 25, 100);
 				// speed up camera as penalty
 				if (this.camera.vx > 0) {
 					this.camera.vx += 0.1;
