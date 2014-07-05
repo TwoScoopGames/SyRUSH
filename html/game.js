@@ -276,7 +276,9 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 }, function(context) {
 	this.camera.drawAbsolute(context, function() {
 		var titleBackground = game.images.get("title-background");
-		context.drawImage(titleBackground, 0, 0);
+		for (var x = 0; x < canvas.width; x += titleBackground.width) {
+			context.drawImage(titleBackground, x, 0);
+		}
 
 		var logo = game.images.get("logo");
 		context.drawImage(logo, (canvas.width / 2) - (logo.width / 2), 200);
