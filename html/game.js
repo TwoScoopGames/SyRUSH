@@ -469,7 +469,12 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 			} else {
 				game.sounds.play("bad-tap");
 				spray(game.mouse, levels[level].particleColor, 5, 25, 100);
-				// FIXME: try speeding up here
+				// speed up camera as penalty
+				if (this.camera.vx > 0) {
+					this.camera.vx += 0.1;
+				} else {
+					this.camera.vx -= 0.1;
+				}
 			}
 		}
 	}
