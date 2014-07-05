@@ -101,9 +101,15 @@ var manifest = {
 
 var game = new Splat.Game(canvas, manifest);
 var godmode = false;
+var score = 0;
+var best = 0;
+var newBest = false;
+var syrupParticles = [];
+var gravity = 0.2;
 var tileSize = 200;
 
 var best = 0;
+
 function getBest() {
 	Splat.saveData.get("bestScore", function(err, data) {
 		if (!err) {
@@ -117,7 +123,9 @@ function getBest() {
 getBest();
 
 function setBest() {
-	Splat.saveData.set({ "bestScore": best }, function(err) { });
+	Splat.saveData.set({
+		"bestScore": best
+	}, function(err) {});
 }
 
 function Particles() {
@@ -221,6 +229,7 @@ function makeWaffle(squaresWide, filledImage, emptyImage, emptyPercent) {
 }
 
 var fillSounds = ["pop1", "pop2", "pop3", "pop4", "pop5", "pop6", "pop7", "pop8"];
+
 function fillSound() {
 	var i = Math.floor(Math.random() * fillSounds.length);
 	game.sounds.play(fillSounds[i]);
