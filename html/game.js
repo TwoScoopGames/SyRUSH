@@ -100,7 +100,7 @@ var manifest = {
 var game = new Splat.Game(canvas, manifest);
 var godmode = true;
 var score = 0;
-var best = Math.floor(getBest());
+var best = 0;
 var newBest = false;
 var syrupParticles = [];
 var gravity = 0.2;
@@ -109,11 +109,19 @@ var fillSounds = ["pop1", "pop2", "pop3", "pop4", "pop5", "pop6", "pop7", "pop8"
 var waffleWidth = 10;
 
 function getBest() {
-	var b = parseInt(Splat.saveData.get("bestScore"));
-	if (isNaN(b) || b < 0 || !b) {
-		b = 0;
-	}
-	return b;
+	Splat.saveData.get("bestScore", function(err, data) {
+		if (!err) {
+			var b = data["bestScore"];
+			if (b) {
+				best = parseInt(b);
+			}
+		}
+	});
+}
+getBest();
+
+function setBest() {
+	Splat.saveData.set({ "bestScore": best }, function(err) { });
 }
 
 function drawCircle(context, color, radius, strokeColor, strokeSize, x, y) {
@@ -462,6 +470,11 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		if (last.filled) {
 			if (nextSquare !== undefined && last.x !== nextSquare.x) {
 				score++;
+				if (score > best) {
+					best = score;
+					newBest = true;
+					setBest();
+				}
 			}
 		} else {
 			if (!godmode) {
