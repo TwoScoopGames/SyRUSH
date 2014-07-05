@@ -101,11 +101,7 @@ var manifest = {
 
 var game = new Splat.Game(canvas, manifest);
 var godmode = false;
-var syrupParticles = [];
-var gravity = 0.2;
 var tileSize = 200;
-var fillSounds = ["pop1", "pop2", "pop3", "pop4", "pop5", "pop6", "pop7", "pop8"];
-var waffleWidth = 10;
 
 var best = 0;
 function getBest() {
@@ -124,6 +120,40 @@ function setBest() {
 	Splat.saveData.set({ "bestScore": best }, function(err) { });
 }
 
+function Particles() {
+	this.particles = [];
+	this.gravity = 0.2;
+}
+Particles.prototype.move = function(elapsedMillis) {
+	for (var i = 0; i < this.particles.length; i++) {
+		var particle = this.particles[i];
+		particle.x += particle.vx * elapsedMillis;
+		particle.y += particle.vy * elapsedMillis;
+		particle.vy += this.gravity;
+	}
+};
+Particles.prototype.draw = function(context) {
+	for (var i = 0; i < this.particles.length; i++) {
+		var particle = this.particles[i];
+		drawCircle(context, particle.color, particle.radius, particle.stroke, 0, particle.x, particle.y);
+	}
+};
+Particles.prototype.spray = function(mouse, color, velocity, radius, quantity) {
+	this.particles = [];
+	for (var q = 0; q < quantity; q++) {
+		this.particles.push({
+			x: mouse.x,
+			y: mouse.y,
+			vx: (Math.random() - 0.5) * velocity,
+			vy: (Math.random() - 0.5) * velocity,
+			radius: Math.random() * radius,
+			color: color,
+			stroke: color
+		});
+	}
+};
+var particles = new Particles();
+
 function drawCircle(context, color, radius, strokeColor, strokeSize, x, y) {
 	context.beginPath();
 	context.arc(x, y, radius, 0, 2 * Math.PI, false);
@@ -132,39 +162,6 @@ function drawCircle(context, color, radius, strokeColor, strokeSize, x, y) {
 	context.lineWidth = strokeSize;
 	context.strokeStyle = strokeColor;
 	context.stroke();
-}
-
-function spray(mouse, color, velocity, radius, quantity) {
-	syrupParticles.length = 0;
-	for (var q = 0; q < quantity; q++) {
-		syrupParticles.push({
-			x: mouse.x,
-			y: mouse.y,
-			xv: (Math.random() - 0.5) * velocity,
-			yv: (Math.random() - 0.5) * velocity,
-			radius: Math.random() * radius,
-			color: color,
-			stroke: color
-		});
-	}
-}
-
-function drawParticles(context, particles) {
-	for (var i = 0; i < particles.length; i++) {
-		var particle = particles[i];
-		drawCircle(context, particle.color, particle.radius, particle.stroke, 0, particle.x, particle.y);
-	}
-}
-
-function moveParticles(elapsedMillis, particles, gravitySwitch) {
-	for (var i = 0; i < particles.length; i++) {
-		var particle = particles[i];
-		particle.x += particle.xv * elapsedMillis;
-		particle.y += particle.yv * elapsedMillis;
-		if (gravitySwitch) {
-			particle.yv += gravity;
-		}
-	}
 }
 
 function centerText(context, text, offsetX, offsetY) {
@@ -223,8 +220,9 @@ function makeWaffle(squaresWide, filledImage, emptyImage, emptyPercent) {
 	return newSquares;
 }
 
+var fillSounds = ["pop1", "pop2", "pop3", "pop4", "pop5", "pop6", "pop7", "pop8"];
 function fillSound() {
-	var i = Math.random() * fillSounds.length | 0;
+	var i = Math.floor(Math.random() * fillSounds.length);
 	game.sounds.play(fillSounds[i]);
 }
 
@@ -411,7 +409,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		this.timers.banner.start();
 	}
 
-	moveParticles(elapsedMillis, syrupParticles, true);
+	particles.move(elapsedMillis);
 
 	if (this.timers.fadeToBlack.running) {
 		return;
@@ -467,10 +465,10 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 				fillSound();
 				square.filled = true;
 				square.sprite = game.animations.get(levels[level].fillAnim).copy();
-				spray(game.mouse, levels[level].particleColor, 5, 25, 8);
+				particles.spray(game.mouse, levels[level].particleColor, 5, 25, 8);
 			} else {
 				game.sounds.play("bad-tap");
-				spray(game.mouse, levels[level].particleColor, 5, 25, 100);
+				particles.spray(game.mouse, levels[level].particleColor, 5, 25, 100);
 				// speed up camera as penalty
 				if (this.camera.vx > 0) {
 					this.camera.vx += 0.1;
@@ -503,7 +501,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		context.fillStyle = "#ffffff";
 		context.font = "100px lato";
 		centerText(context, scene.score, 0, 100);
-		drawParticles(context, syrupParticles);
+		particles.draw(context);
 		if (scene.message === "Next waffle!") {
 			var nextWaffle = game.animations.get("next-waffle-anim");
 			nextWaffle.draw(context, (canvas.width / 2) - (nextWaffle.width / 2), (canvas.height / 2) - (nextWaffle.height / 2));
