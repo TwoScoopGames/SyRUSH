@@ -14,11 +14,14 @@ var manifest = {
 		"bg-left": "images/bg-left.png",
 		"bg-right": "images/bg-right.png",
 		"butter-filled": "images/butter-filled.png",
+		"butter-sugar-filled": "images/butter-sugar-filled.png",
 		"butter-syrup-filled": "images/butter-syrup-filled.png",
 		"logo": "images/logo.png",
 		"sound-off": "images/sound-off-icon.png",
 		"sound-on": "images/sound-on-icon.png",
 		"start-button": "images/start-button.png",
+		"strawberry-filled": "images/strawberry-filled.png",
+		"strawberry-cream-filled": "images/strawberry-cream-filled.png",
 		"syrup-filled": "images/syrup-filled.png",
 		"title-background": "images/title-background.png",
 		"waffle-hole": "images/waffle-hole.png",
@@ -47,17 +50,17 @@ var manifest = {
 		}
 	},
 	"animations": {
-		"blueberry-cream-anim": {
-			"strip": "images/blueberry-cream-anim.png",
-			"frames": 3,
-			"msPerFrame": 75,
-			"repeatAt": 2
-		},
 		"blueberry-anim": {
 			"strip": "images/blueberry-anim.png",
 			"frames": 4,
 			"msPerFrame": 75,
 			"repeatAt": 3
+		},
+		"blueberry-cream-anim": {
+			"strip": "images/blueberry-cream-anim.png",
+			"frames": 3,
+			"msPerFrame": 75,
+			"repeatAt": 2
 		},
 		"butter-anim": {
 			"strip": "images/butter-anim.png",
@@ -65,8 +68,38 @@ var manifest = {
 			"msPerFrame": 75,
 			"repeatAt": 3
 		},
+		"butter-sugar-anim": {
+			"strip": "images/butter-sugar-anim.png",
+			"frames": 4,
+			"msPerFrame": 75,
+			"repeatAt": 3
+		},
 		"butter-syrup-anim": {
 			"strip": "images/butter-syrup-anim.png",
+			"frames": 4,
+			"msPerFrame": 75,
+			"repeatAt": 3
+		},
+		"next-waffle-anim": {
+			"strip": "images/next-waffle-anim.png",
+			"frames": 8,
+			"msPerFrame": 50,
+			"repeatAt": 7
+		},
+		"next-topping-anim": {
+			"strip": "images/next-topping-anim.png",
+			"frames": 7,
+			"msPerFrame": 50,
+			"repeatAt": 6
+		},
+		"strawberry-anim": {
+			"strip": "images/strawberry-anim.png",
+			"frames": 4,
+			"msPerFrame": 75,
+			"repeatAt": 3
+		},
+		"strawberry-cream-anim": {
+			"strip": "images/strawberry-cream-anim.png",
 			"frames": 4,
 			"msPerFrame": 75,
 			"repeatAt": 3
@@ -83,24 +116,11 @@ var manifest = {
 			"msPerFrame": 50,
 			"repeatAt": 31
 		},
-		"next-waffle-anim": {
-			"strip": "images/next-waffle-anim.png",
-			"frames": 8,
-			"msPerFrame": 50,
-			"repeatAt": 7
-		},
-		"next-topping-anim": {
-			"strip": "images/next-topping-anim.png",
-			"frames": 7,
-			"msPerFrame": 50,
-			"repeatAt": 6
-		},
-
 	}
 };
 
 var game = new Splat.Game(canvas, manifest);
-var godmode = false;
+var godmode = true;
 var score = 0;
 var best = 0;
 var newBest = false;
@@ -321,10 +341,12 @@ function makeLevel(filledImage, emptyImage, fillAnim, particleColor, width, spee
 }
 
 var butterOnly = makeLevel.bind(undefined, "butter-filled", "waffle-hole", "butter-anim", "yellow");
-var syrupOnly = makeLevel.bind(undefined, "syrup-filled", "waffle-hole", "syrup-anim", "#6d511f");
+var butterSugar = makeLevel.bind(undefined, "butter-sugar-filled", "butter-filled", "butter-sugar-anim", "#6d511f");
 var butterSyrup = makeLevel.bind(undefined, "butter-syrup-filled", "butter-filled", "butter-syrup-anim", "#6d511f");
-var berriesOnly = makeLevel.bind(undefined, "blueberry-filled-3", "waffle-hole", "blueberry-anim", "rgba(255,255,255,1)");
-var berriesCream = makeLevel.bind(undefined, "blueberry-cream-filled", "blueberry-filled-3", "blueberry-cream-anim", "rgba(255,255,255,0)");
+var blueberryOnly = makeLevel.bind(undefined, "blueberry-filled-3", "waffle-hole", "blueberry-anim", "rgba(255,255,255,1)");
+var blueberryCream = makeLevel.bind(undefined, "blueberry-cream-filled", "blueberry-filled-3", "blueberry-cream-anim", "rgba(255,255,255,0)");
+var strawberryOnly = makeLevel.bind(undefined, "strawberry-filled", "waffle-hole", "strawberry-anim", "rgba(255,255,255,1)");
+var strawberryCream = makeLevel.bind(undefined, "strawberry-cream-filled", "strawberry-filled", "strawberry-cream-anim", "rgba(255,255,255,0)");
 
 function randomIntBetween(min, max) {
 	return Math.floor(Math.random() * (max - min + 1) + min);
@@ -339,12 +361,19 @@ function generateLevels() {
 	var speed = 0.20 + (0.02 * l);
 	var empty = 0.3 + (0.05 * l);
 
-	if (l % 2 === 0) {
+	var levelSequence = l % 4;
+	if (levelSequence === 0) {
 		levels.push(butterOnly(width, speed, empty));
 		levels.push(butterSyrup(width, -speed, empty));
+	} else if (levelSequence === 1) {
+		levels.push(blueberryOnly(width, speed, empty));
+		levels.push(blueberryCream(width, -speed, empty));
+	} else if (levelSequence === 2) {
+		levels.push(butterOnly(width, speed, empty));
+		levels.push(butterSugar(width, -speed, empty));
 	} else {
-		levels.push(berriesOnly(width, speed, empty));
-		levels.push(berriesCream(width, -speed, empty));
+		levels.push(strawberryOnly(width, speed, empty));
+		levels.push(strawberryCream(width, -speed, empty));
 	}
 }
 
