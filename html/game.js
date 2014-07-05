@@ -2,7 +2,10 @@
 
 var canvas = document.getElementById("canvas");
 canvas.height = 1136;
-canvas.width = window.innerWidth * (canvas.height / window.innerHeight);
+canvas.width = 640;
+if (window.ejecta) {
+	canvas.width = window.innerWidth * (canvas.height / window.innerHeight);
+}
 
 var manifest = {
 	"images": {
@@ -486,7 +489,10 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 			}
 		}
 	}
-
+	for (var t = 0; t < game.mouse.touches.length; t++) {
+		var touch = game.mouse.touches[t];
+		console.log("touch.x ", touch.x, " touch.y ", touch.y, "\n this.camera.x ", this.camera.x, " this.camera.y ", this.camera.y);
+	}
 	for (var i = 0; i < this.squares.length; i++) {
 		var square = this.squares[i];
 		square.move(elapsedMillis);
@@ -495,6 +501,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 			if (touch.consumed) {
 				continue;
 			}
+
 			if (!isInside(square, touch.x + this.camera.x, touch.y)) {
 				continue;
 			}
@@ -516,6 +523,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 			}
 		}
 	}
+
 }, function(context) {
 	if (level < 0) {
 		return;
