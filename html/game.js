@@ -7,10 +7,10 @@ canvas.width = window.innerWidth * (canvas.height / window.innerHeight);
 var manifest = {
 	"images": {
 		"ad-placeholder": "images/ad-placeholder.png",
-		"berries-cream-filled": "images/berries-cream-filled.png",
-		"berry-filled": "images/berry-filled.png",
-		"berry-filled-2": "images/berry-filled-2.png",
-		"berry-filled-3": "images/berry-filled-3.png",
+		"berries-cream-filled": "images/blueberry-cream-filled.png",
+		"berry-filled": "images/blueberry-filled.png",
+		"berry-filled-2": "images/blueberry-filled-2.png",
+		"berry-filled-3": "images/blueberry-filled-3.png",
 		"bg-left": "images/bg-left.png",
 		"bg-right": "images/bg-right.png",
 		"butter-filled": "images/butter-filled.png",
@@ -48,13 +48,13 @@ var manifest = {
 	},
 	"animations": {
 		"berries-cream-anim": {
-			"strip": "images/berries-cream-anim.png",
+			"strip": "images/blueberry-cream-anim.png",
 			"frames": 3,
 			"msPerFrame": 75,
 			"repeatAt": 2
 		},
 		"berry-anim": {
-			"strip": "images/berry-anim.png",
+			"strip": "images/blueberry-anim.png",
 			"frames": 4,
 			"msPerFrame": 75,
 			"repeatAt": 3
