@@ -198,8 +198,8 @@ function drawScoreScreen(context, scene) {
 	});
 }
 
-function makeSquare(x, y, filledImage, emptyImage) {
-	var isFilled = Math.random() > 0.5;
+function makeSquare(x, y, filledImage, emptyImage, emptyPercent) {
+	var isFilled = Math.random() > emptyPercent;
 
 	var image = isFilled ? filledImage : emptyImage;
 	var entity = new Splat.AnimatedEntity(x, y, tileSize, tileSize, image, 0, 0);
@@ -207,18 +207,18 @@ function makeSquare(x, y, filledImage, emptyImage) {
 	return entity;
 }
 
-function makeSquareColumn(x, filledImage, emptyImage) {
+function makeSquareColumn(x, filledImage, emptyImage, emptyPercent) {
 	var squares = [];
 	for (var y = 0; y < canvas.height; y += tileSize) {
-		squares.unshift(makeSquare(x, y, filledImage, emptyImage));
+		squares.unshift(makeSquare(x, y, filledImage, emptyImage, emptyPercent));
 	}
 	return squares;
 }
 
-function makeWaffle(squaresWide, filledImage, emptyImage) {
+function makeWaffle(squaresWide, filledImage, emptyImage, emptyPercent) {
 	var newSquares = [];
 	for (var i = 0; i < squaresWide; i++) {
-		newSquares = newSquares.concat(makeSquareColumn(i * tileSize, filledImage, emptyImage));
+		newSquares = newSquares.concat(makeSquareColumn(i * tileSize, filledImage, emptyImage, emptyPercent));
 	}
 	return newSquares;
 }
@@ -299,67 +299,31 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	});
 }));
 
-function butterOnly(width, speed) {
+function makeLevel(filledImage, emptyImage, fillAnim, particleColor, width, speed, emptyPercent) {
 	return {
-		filledImage: "butter-filled",
-		emptyImage: "waffle-hole",
-		fillAnim: "butter-anim",
-		particleColor: "yellow",
+		filledImage: filledImage,
+		emptyImage: emptyImage,
+		fillAnim: fillAnim,
+		particleColor: particleColor,
 		width: width,
-		speed: speed
+		speed: speed,
+		emptyPercent: emptyPercent
 	};
 }
 
-function syrupOnly(width, speed) {
-	return {
-		filledImage: "syrup-filled",
-		emptyImage: "waffle-hole",
-		fillAnim: "syrup-anim",
-		particleColor: "#6d511f",
-		width: width,
-		speed: speed
-	};
-}
-
-function butterSyrup(width, speed) {
-	return {
-		filledImage: "butter-syrup-filled",
-		emptyImage: "butter-filled",
-		fillAnim: "butter-syrup-anim",
-		particleColor: "#6d511f",
-		width: width,
-		speed: speed
-	};
-}
-
-function berriesOnly(width, speed) {
-	return {
-		filledImage: "berry-filled-3",
-		emptyImage: "waffle-hole",
-		fillAnim: "berry-anim",
-		particleColor: "rgba(255,255,255,1)",
-		width: width,
-		speed: speed
-	};
-}
-
-function berriesCream(width, speed) {
-	return {
-		emptyImage: "berry-filled-3",
-		fillAnim: "berries-cream-anim",
-		particleColor: "rgba(255,255,255,0)",
-		width: width,
-		speed: speed
-	};
-}
+var butterOnly = makeLevel.bind(undefined, "butter-filled", "waffle-hole", "butter-anim", "yellow");
+var syrupOnly = makeLevel.bind(undefined, "syrup-filled", "waffle-hole", "syrup-anim", "#6d511f");
+var butterSyrup = makeLevel.bind(undefined, "butter-syrup-filled", "butter-filled", "butter-syrup-anim", "#6d511f");
+var berriesOnly = makeLevel.bind(undefined, "berry-filled-3", "waffle-hole", "berry-anim", "rgba(255,255,255,1)");
+var berriesCream = makeLevel.bind(undefined, "berries-cream-filled", "berry-filled-3", "berries-cream-anim", "rgba(255,255,255,0)");
 
 function randomIntBetween(min, max) {
 	return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-var minWidth = 20;
-var maxWidth = 40;
-var speed = 0.20;
+var minWidth = 2;
+var maxWidth = 4;
+var speed = 0.30;
 var level = -1;
 var levels = [
 	//syrupOnly(randomIntBetween(1, 2), speed),
@@ -369,8 +333,8 @@ var levels = [
 	//butterSyrup(randomIntBetween(minWidth, maxWidth), speed),
 	//berriesOnly(randomIntBetween(minWidth, maxWidth), -speed),
 	//berriesCream(randomIntBetween(minWidth, maxWidth), speed),
-	berriesOnly(randomIntBetween(minWidth, maxWidth), speed),
-	berriesOnly(randomIntBetween(minWidth, maxWidth), -speed),
+	berriesOnly(2, speed, 0.3),
+	berriesCream(2, -speed, 0.3),
 	//berriesCream(randomIntBetween(minWidth, maxWidth), speed)
 ];
 
@@ -381,7 +345,7 @@ function isOdd(num) {
 function makeWaffleForLevel() {
 	var filledSquare = game.images.get(levels[level].filledImage);
 	var goalSquare = game.images.get(levels[level].emptyImage);
-	return makeWaffle(levels[level].width, filledSquare, goalSquare);
+	return makeWaffle(levels[level].width, filledSquare, goalSquare, levels[level].emptyPercent);
 }
 
 game.scenes.add("main", new Splat.Scene(canvas, function() {
@@ -390,6 +354,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 
 	score = 0;
 	newBest = false;
+	this.message = "";
 
 	this.nextLevel = function() {
 		level++;
@@ -400,8 +365,6 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		}
 
 		this.camera.vx = levels[level].speed;
-
-
 
 		this.squares = makeWaffleForLevel();
 	}.bind(this);
