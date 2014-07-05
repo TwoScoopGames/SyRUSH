@@ -321,22 +321,23 @@ function randomIntBetween(min, max) {
 	return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-var minWidth = 2;
-var maxWidth = 4;
-var speed = 0.30;
 var level = -1;
-var levels = [
-	//syrupOnly(randomIntBetween(1, 2), speed),
-	//butterOnly(randomIntBetween(2, 3), -speed),
-	//syrupOnly(randomIntBetween(minWidth, maxWidth), speed),
-	//butterOnly(randomIntBetween(minWidth, maxWidth), -speed),
-	//butterSyrup(randomIntBetween(minWidth, maxWidth), speed),
-	//berriesOnly(randomIntBetween(minWidth, maxWidth), -speed),
-	//berriesCream(randomIntBetween(minWidth, maxWidth), speed),
-	berriesOnly(2, speed, 0.3),
-	berriesCream(2, -speed, 0.3),
-	//berriesCream(randomIntBetween(minWidth, maxWidth), speed)
-];
+var levels = [];
+
+function generateLevels() {
+	var l = Math.floor(levels.length / 2);
+	var width = 15 + (4 * l);
+	var speed = 0.3 + (0.01 * l);
+	var empty = 0.4 + (0.05 * l);
+
+	if (l % 2 === 0) {
+		levels.push(butterOnly(width, speed, empty));
+		levels.push(butterSyrup(width, -speed, empty));
+	} else {
+		levels.push(berriesOnly(width, speed, empty));
+		levels.push(berriesCream(width, -speed, empty));
+	}
+}
 
 function isOdd(num) {
 	return num % 2;
@@ -355,13 +356,12 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 	score = 0;
 	newBest = false;
 	this.message = "";
+	levels = [];
 
 	this.nextLevel = function() {
 		level++;
 		if (level >= levels.length) {
-			level = -1;
-			game.scenes.switchTo("game-title");
-			return;
+			generateLevels();
 		}
 
 		this.camera.vx = levels[level].speed;
@@ -469,7 +469,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 			} else {
 				game.sounds.play("bad-tap");
 				spray(game.mouse, levels[level].particleColor, 5, 25, 100);
-				speed += 0.05;
+				// FIXME: try speeding up here
 			}
 		}
 	}
