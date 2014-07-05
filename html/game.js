@@ -503,16 +503,13 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		centerText(context, Math.floor(score), 0, 100);
 		drawParticles(context, syrupParticles);
 		if (scene.message === "Next waffle!") {
-			console.log("Next waffle!");
 			var nextWaffle = game.animations.get("next-waffle-anim");
 			nextWaffle.draw(context, (canvas.width / 2) - (nextWaffle.width / 2), (canvas.height / 2) - (nextWaffle.height / 2));
 		}
 		if (scene.message === "Next topping!") {
-			console.log("Next topping!");
 			var nextTopping = game.animations.get("next-topping-anim");
 			nextTopping.draw(context, (canvas.width / 2) - (nextTopping.width / 2), 0);
 		}
-
 	});
 }));
 
