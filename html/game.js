@@ -42,7 +42,17 @@ var manifest = {
 		"pop5": "sound/pop5.wav",
 		"pop6": "sound/pop6.wav",
 		"pop7": "sound/pop7.wav",
-		"pop8": "sound/pop8.wav"
+		"pop8": "sound/pop8.wav",
+		"whip1": "sound/whip-1.mp3",
+		"whip2": "sound/whip-2.mp3",
+		"whip3": "sound/whip-3.mp3",
+		"whip4": "sound/whip-4.mp3",
+		"whip5": "sound/whip-5.mp3",
+		"whip6": "sound/whip-6.mp3",
+		"whip7": "sound/whip-7.mp3",
+		"whip8": "sound/whip-8.mp3",
+		"whip9": "sound/whip-9.mp3",
+		"whip10": "sound/whip-10.mp3",
 	},
 	"fonts": {
 		"lato": {
@@ -251,8 +261,6 @@ function makeWaffle(squaresWide, filledImage, emptyImage, emptyPercent) {
 	return newSquares;
 }
 
-var fillSounds = ["pop1", "pop2", "pop3", "pop4", "pop5", "pop6", "pop7", "pop8"];
-
 function playRandomSound(sounds) {
 	if (typeof sounds === "string") {
 		sounds = [sounds];
@@ -347,13 +355,16 @@ function makeLevel(filledImage, emptyImage, fillAnim, particleColor, fillSounds,
 	};
 }
 
-var butterOnly = makeLevel.bind(undefined, "butter-filled", "waffle-hole", "butter-anim", "yellow", fillSounds);
-var butterSugar = makeLevel.bind(undefined, "butter-sugar-filled", "butter-filled", "butter-sugar-anim", "rgba(255,255,255,1)", fillSounds);
-var butterSyrup = makeLevel.bind(undefined, "butter-syrup-filled", "butter-filled", "butter-syrup-anim", "#6d511f", fillSounds);
-var blueberryOnly = makeLevel.bind(undefined, "blueberry-filled-3", "waffle-hole", "blueberry-anim", "rgba(255,255,255,0)", fillSounds);
-var blueberryCream = makeLevel.bind(undefined, "blueberry-cream-filled", "blueberry-filled-3", "blueberry-cream-anim", "rgba(255,255,255,1)", fillSounds);
-var strawberryOnly = makeLevel.bind(undefined, "strawberry-filled", "waffle-hole", "strawberry-anim", "rgba(255,255,255,0)", fillSounds);
-var strawberryCream = makeLevel.bind(undefined, "strawberry-cream-filled", "strawberry-filled", "strawberry-cream-anim", "rgba(255,255,255,1)", fillSounds);
+var popSounds = ["pop1", "pop2", "pop3", "pop4", "pop5", "pop6", "pop7", "pop8"];
+var whipSounds = ["whip1", "whip2", "whip3", "whip4", "whip5", "whip6", "whip7", "whip8", "whip9", "whip10"];
+
+var butterOnly = makeLevel.bind(undefined, "butter-filled", "waffle-hole", "butter-anim", "yellow", popSounds);
+var butterSugar = makeLevel.bind(undefined, "butter-sugar-filled", "butter-filled", "butter-sugar-anim", "rgba(255,255,255,1)", popSounds);
+var butterSyrup = makeLevel.bind(undefined, "butter-syrup-filled", "butter-filled", "butter-syrup-anim", "#6d511f", popSounds);
+var blueberryOnly = makeLevel.bind(undefined, "blueberry-filled-3", "waffle-hole", "blueberry-anim", "rgba(255,255,255,0)", popSounds);
+var blueberryCream = makeLevel.bind(undefined, "blueberry-cream-filled", "blueberry-filled-3", "blueberry-cream-anim", "rgba(255,255,255,1)", whipSounds);
+var strawberryOnly = makeLevel.bind(undefined, "strawberry-filled", "waffle-hole", "strawberry-anim", "rgba(255,255,255,0)", popSounds);
+var strawberryCream = makeLevel.bind(undefined, "strawberry-cream-filled", "strawberry-filled", "strawberry-cream-anim", "rgba(255,255,255,1)", whipSounds);
 
 function randomIntBetween(min, max) {
 	return Math.floor(Math.random() * (max - min + 1) + min);
