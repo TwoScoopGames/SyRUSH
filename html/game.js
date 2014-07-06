@@ -284,6 +284,7 @@ function isInside(container, x, y) {
 
 game.scenes.add("title", new Splat.Scene(canvas, function() {
 	this.timers.running = new Splat.Timer(null, 1, function() {
+		Splat.ads.show(false);
 		game.scenes.switchTo("game-title");
 	});
 	this.timers.running.start();
@@ -312,6 +313,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	if (game.mouse.consumePressed(0)) {
 		game.sounds.play("button");
 		game.sounds.play("music", true);
+		Splat.ads.hide();
 		game.scenes.switchTo("main");
 	}
 }, function(context) {
@@ -501,6 +503,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		} else {
 			if (!godmode) {
 				game.sounds.play("gasp");
+				Splat.ads.show(false);
 				this.timers.fadeToBlack.start();
 				this.camera.vx = 0;
 				return;
@@ -537,7 +540,6 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 			}
 		}
 	}
-
 }, function(context) {
 	if (level < 0) {
 		return;
