@@ -9,7 +9,6 @@ if (window.ejecta) {
 
 var manifest = {
 	"images": {
-		"ad-placeholder": "images/ad-placeholder.png",
 		"blueberry-cream-filled": "images/blueberry-cream-filled.png",
 		"blueberry-filled": "images/blueberry-filled.png",
 		"blueberry-filled-2": "images/blueberry-filled-2.png",
@@ -332,9 +331,6 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		context.fillStyle = "#fff";
 		context.font = "50px lato";
 		centerText(context, "Music by Glass Boy", 0, canvas.height - 60);
-
-		var adPlaceholder = game.images.get("ad-placeholder");
-		context.drawImage(adPlaceholder, 0, 0);
 
 		var soundSwitch;
 		if (game.sounds.muted) {
