@@ -358,13 +358,13 @@ function makeLevel(filledImage, emptyImage, fillAnim, particleColor, fillSounds,
 var popSounds = ["pop1", "pop2", "pop3", "pop4", "pop5", "pop6", "pop7", "pop8"];
 var whipSounds = ["whip1", "whip2", "whip3", "whip4", "whip5", "whip6", "whip7", "whip8", "whip9", "whip10"];
 
-var butterOnly = makeLevel.bind(undefined, "butter-filled", "waffle-hole", "butter-anim", "yellow", popSounds);
-var butterSugar = makeLevel.bind(undefined, "butter-sugar-filled", "butter-filled", "butter-sugar-anim", "rgba(255,255,255,1)", popSounds);
+var butterOnly = makeLevel.bind(undefined, "butter-filled", "waffle-hole", "butter-anim", "#fde95e", popSounds);
+var butterSugar = makeLevel.bind(undefined, "butter-sugar-filled", "butter-filled", "butter-sugar-anim", "#ffffff", popSounds);
 var butterSyrup = makeLevel.bind(undefined, "butter-syrup-filled", "butter-filled", "butter-syrup-anim", "#6d511f", popSounds);
-var blueberryOnly = makeLevel.bind(undefined, "blueberry-filled-3", "waffle-hole", "blueberry-anim", "rgba(255,255,255,0)", popSounds);
-var blueberryCream = makeLevel.bind(undefined, "blueberry-cream-filled", "blueberry-filled-3", "blueberry-cream-anim", "rgba(255,255,255,1)", whipSounds);
-var strawberryOnly = makeLevel.bind(undefined, "strawberry-filled", "waffle-hole", "strawberry-anim", "rgba(255,255,255,0)", popSounds);
-var strawberryCream = makeLevel.bind(undefined, "strawberry-cream-filled", "strawberry-filled", "strawberry-cream-anim", "rgba(255,255,255,1)", whipSounds);
+var blueberryOnly = makeLevel.bind(undefined, "blueberry-filled-3", "waffle-hole", "blueberry-anim", "#760630", popSounds);
+var blueberryCream = makeLevel.bind(undefined, "blueberry-cream-filled", "blueberry-filled-3", "blueberry-cream-anim", "#ffffff", whipSounds);
+var strawberryOnly = makeLevel.bind(undefined, "strawberry-filled", "waffle-hole", "strawberry-anim", "#e33838", popSounds);
+var strawberryCream = makeLevel.bind(undefined, "strawberry-cream-filled", "strawberry-filled", "strawberry-cream-anim", "#ffffff", whipSounds);
 
 function randomIntBetween(min, max) {
 	return Math.floor(Math.random() * (max - min + 1) + min);
