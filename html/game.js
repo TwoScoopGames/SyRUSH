@@ -253,9 +253,12 @@ function makeWaffle(squaresWide, filledImage, emptyImage, emptyPercent) {
 
 var fillSounds = ["pop1", "pop2", "pop3", "pop4", "pop5", "pop6", "pop7", "pop8"];
 
-function fillSound() {
-	var i = Math.floor(Math.random() * fillSounds.length);
-	game.sounds.play(fillSounds[i]);
+function playRandomSound(sounds) {
+	if (typeof sounds === "string") {
+		sounds = [sounds];
+	}
+	var i = Math.floor(Math.random() * sounds.length);
+	game.sounds.play(sounds[i]);
 }
 
 function isInside(container, x, y) {
@@ -331,7 +334,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	});
 }));
 
-function makeLevel(filledImage, emptyImage, fillAnim, particleColor, width, speed, emptyPercent) {
+function makeLevel(filledImage, emptyImage, fillAnim, particleColor, fillSounds, width, speed, emptyPercent) {
 	return {
 		filledImage: filledImage,
 		emptyImage: emptyImage,
@@ -339,17 +342,18 @@ function makeLevel(filledImage, emptyImage, fillAnim, particleColor, width, spee
 		particleColor: particleColor,
 		width: width,
 		speed: speed,
-		emptyPercent: emptyPercent
+		emptyPercent: emptyPercent,
+		fillSounds: fillSounds
 	};
 }
 
-var butterOnly = makeLevel.bind(undefined, "butter-filled", "waffle-hole", "butter-anim", "yellow");
-var butterSugar = makeLevel.bind(undefined, "butter-sugar-filled", "butter-filled", "butter-sugar-anim", "rgba(255,255,255,1)");
-var butterSyrup = makeLevel.bind(undefined, "butter-syrup-filled", "butter-filled", "butter-syrup-anim", "#6d511f");
-var blueberryOnly = makeLevel.bind(undefined, "blueberry-filled-3", "waffle-hole", "blueberry-anim", "rgba(255,255,255,0)");
-var blueberryCream = makeLevel.bind(undefined, "blueberry-cream-filled", "blueberry-filled-3", "blueberry-cream-anim", "rgba(255,255,255,1)");
-var strawberryOnly = makeLevel.bind(undefined, "strawberry-filled", "waffle-hole", "strawberry-anim", "rgba(255,255,255,0)");
-var strawberryCream = makeLevel.bind(undefined, "strawberry-cream-filled", "strawberry-filled", "strawberry-cream-anim", "rgba(255,255,255,1)");
+var butterOnly = makeLevel.bind(undefined, "butter-filled", "waffle-hole", "butter-anim", "yellow", fillSounds);
+var butterSugar = makeLevel.bind(undefined, "butter-sugar-filled", "butter-filled", "butter-sugar-anim", "rgba(255,255,255,1)", fillSounds);
+var butterSyrup = makeLevel.bind(undefined, "butter-syrup-filled", "butter-filled", "butter-syrup-anim", "#6d511f", fillSounds);
+var blueberryOnly = makeLevel.bind(undefined, "blueberry-filled-3", "waffle-hole", "blueberry-anim", "rgba(255,255,255,0)", fillSounds);
+var blueberryCream = makeLevel.bind(undefined, "blueberry-cream-filled", "blueberry-filled-3", "blueberry-cream-anim", "rgba(255,255,255,1)", fillSounds);
+var strawberryOnly = makeLevel.bind(undefined, "strawberry-filled", "waffle-hole", "strawberry-anim", "rgba(255,255,255,0)", fillSounds);
+var strawberryCream = makeLevel.bind(undefined, "strawberry-cream-filled", "strawberry-filled", "strawberry-cream-anim", "rgba(255,255,255,1)", fillSounds);
 
 function randomIntBetween(min, max) {
 	return Math.floor(Math.random() * (max - min + 1) + min);
@@ -503,7 +507,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 			}
 			touch.consumed = true;
 			if (!square.filled) {
-				fillSound();
+				playRandomSound(levels[level].fillSounds);
 				square.filled = true;
 				square.sprite = game.animations.get(levels[level].fillAnim).copy();
 				particles.spray(game.mouse.x, game.mouse.y, levels[level].particleColor, 5, 25, 8);
