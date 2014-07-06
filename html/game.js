@@ -43,6 +43,8 @@ var manifest = {
 		"pop6": "sound/pop6.wav",
 		"pop7": "sound/pop7.wav",
 		"pop8": "sound/pop8.wav",
+		"sugar1": "sound/sugar-1.mp3",
+		"sugar2": "sound/sugar-2.mp3",
 		"whip1": "sound/whip-1.mp3",
 		"whip2": "sound/whip-2.mp3",
 		"whip3": "sound/whip-3.mp3",
@@ -357,9 +359,10 @@ function makeLevel(filledImage, emptyImage, fillAnim, particleColor, fillSounds,
 
 var popSounds = ["pop1", "pop2", "pop3", "pop4", "pop5", "pop6", "pop7", "pop8"];
 var whipSounds = ["whip1", "whip2", "whip3", "whip4", "whip5", "whip6", "whip7", "whip8", "whip9", "whip10"];
+var sugarSounds = ["sugar1", "sugar2"];
 
 var butterOnly = makeLevel.bind(undefined, "butter-filled", "waffle-hole", "butter-anim", "#fde95e", popSounds);
-var butterSugar = makeLevel.bind(undefined, "butter-sugar-filled", "butter-filled", "butter-sugar-anim", "#ffffff", popSounds);
+var butterSugar = makeLevel.bind(undefined, "butter-sugar-filled", "butter-filled", "butter-sugar-anim", "#ffffff", sugarSounds);
 var butterSyrup = makeLevel.bind(undefined, "butter-syrup-filled", "butter-filled", "butter-syrup-anim", "#6d511f", popSounds);
 var blueberryOnly = makeLevel.bind(undefined, "blueberry-filled-3", "waffle-hole", "blueberry-anim", "#760630", popSounds);
 var blueberryCream = makeLevel.bind(undefined, "blueberry-cream-filled", "blueberry-filled-3", "blueberry-cream-anim", "#ffffff", whipSounds);
