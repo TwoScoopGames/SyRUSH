@@ -303,7 +303,7 @@ game.scenes.add("title", new Splat.Scene(canvas, function() {
 game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 
 }, function(elapsedMillis) {
-	if (game.mouse.consumePressed(0, (canvas.width - 115), 100, 115, 109)) {
+	if (game.mouse.consumePressed(0, (canvas.width - 115), Splat.ads.height, 115, 109)) {
 		game.sounds.muted = !game.sounds.muted;
 		if (game.sounds.muted) {
 			game.sounds.stop("music");
@@ -338,7 +338,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		} else {
 			soundSwitch = game.images.get("sound-on");
 		}
-		context.drawImage(soundSwitch, (canvas.width - soundSwitch.width), 100);
+		context.drawImage(soundSwitch, (canvas.width - soundSwitch.width), Splat.ads.height);
 	});
 }));
 
