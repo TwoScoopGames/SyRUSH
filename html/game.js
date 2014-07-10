@@ -9,22 +9,12 @@ if (window.ejecta) {
 
 var manifest = {
 	"images": {
-		"blueberry-cream-filled": "images/blueberry-cream-filled.png",
-		"blueberry-filled": "images/blueberry-filled.png",
-		"blueberry-filled-2": "images/blueberry-filled-2.png",
-		"blueberry-filled-3": "images/blueberry-filled-3.png",
 		"bg-left": "images/bg-left.png",
 		"bg-right": "images/bg-right.png",
-		"butter-filled": "images/butter-filled.png",
-		"butter-sugar-filled": "images/butter-sugar-filled.png",
-		"butter-syrup-filled": "images/butter-syrup-filled.png",
 		"logo": "images/logo.png",
 		"sound-off": "images/sound-off-icon.png",
 		"sound-on": "images/sound-on-icon.png",
 		"start-button": "images/start-button.png",
-		"strawberry-filled": "images/strawberry-filled.png",
-		"strawberry-cream-filled": "images/strawberry-cream-filled.png",
-		"syrup-filled": "images/syrup-filled.png",
 		"title-background": "images/title-background.png",
 		"waffle-hole": "images/waffle-hole.png",
 	},
@@ -237,27 +227,36 @@ function drawScoreScreen(context, scene) {
 	});
 }
 
-function makeSquare(x, y, filledImage, emptyImage, emptyPercent) {
+function makeSquare(x, y, toppings, emptyPercent) {
 	var isFilled = Math.random() > emptyPercent;
 
-	var image = isFilled ? filledImage : emptyImage;
+	var i = toppings.length - 1;
+	while(Math.random() <= emptyPercent && i > -1) {
+		i--;
+	}
+	var image = game.images.get("waffle-hole");
+	if (i >= 0) {
+		image = game.animations.get(toppings[i].animation).copy();
+	}
+
 	var entity = new Splat.AnimatedEntity(x, y, tileSize, tileSize, image, 0, 0);
-	entity.filled = isFilled;
+	entity.nextToppings = toppings.slice(i+1);
+	entity.lastTopping = toppings[toppings.length - 1];
 	return entity;
 }
 
-function makeSquareColumn(x, filledImage, emptyImage, emptyPercent) {
+function makeSquareColumn(x, toppings, emptyPercent) {
 	var squares = [];
 	for (var y = 0; y < canvas.height; y += tileSize) {
-		squares.unshift(makeSquare(x, y, filledImage, emptyImage, emptyPercent));
+		squares.unshift(makeSquare(x, y, toppings, emptyPercent));
 	}
 	return squares;
 }
 
-function makeWaffle(squaresWide, filledImage, emptyImage, emptyPercent) {
+function makeWaffle(squaresWide, toppings, emptyPercent) {
 	var newSquares = [];
 	for (var i = 0; i < squaresWide; i++) {
-		newSquares = newSquares.concat(makeSquareColumn(i * tileSize, filledImage, emptyImage, emptyPercent));
+		newSquares = newSquares.concat(makeSquareColumn(i * tileSize, toppings, emptyPercent));
 	}
 	return newSquares;
 }
@@ -342,16 +341,12 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	});
 }));
 
-function makeLevel(filledImage, emptyImage, fillAnim, particleColor, fillSounds, width, speed, emptyPercent) {
+function makeLevel(toppings, width, speed, emptyPercent) {
 	return {
-		filledImage: filledImage,
-		emptyImage: emptyImage,
-		fillAnim: fillAnim,
-		particleColor: particleColor,
+		toppings: toppings,
 		width: width,
 		speed: speed,
-		emptyPercent: emptyPercent,
-		fillSounds: fillSounds
+		emptyPercent: emptyPercent
 	};
 }
 
@@ -359,13 +354,52 @@ var popSounds = ["pop1", "pop2", "pop3", "pop4", "pop5", "pop6", "pop7", "pop8"]
 var whipSounds = ["whip1", "whip2", "whip3", "whip4", "whip5", "whip6", "whip7", "whip8", "whip9", "whip10"];
 var sugarSounds = ["sugar1", "sugar2"];
 
-var butterOnly = makeLevel.bind(undefined, "butter-filled", "waffle-hole", "butter-anim", "#fde95e", popSounds);
-var butterSugar = makeLevel.bind(undefined, "butter-sugar-filled", "butter-filled", "butter-sugar-anim", "#ffffff", sugarSounds);
-var butterSyrup = makeLevel.bind(undefined, "butter-syrup-filled", "butter-filled", "butter-syrup-anim", "#6d511f", popSounds);
-var blueberryOnly = makeLevel.bind(undefined, "blueberry-filled-3", "waffle-hole", "blueberry-anim", "#760630", popSounds);
-var blueberryCream = makeLevel.bind(undefined, "blueberry-cream-filled", "blueberry-filled-3", "blueberry-cream-anim", "#ffffff", whipSounds);
-var strawberryOnly = makeLevel.bind(undefined, "strawberry-filled", "waffle-hole", "strawberry-anim", "#e33838", popSounds);
-var strawberryCream = makeLevel.bind(undefined, "strawberry-cream-filled", "strawberry-filled", "strawberry-cream-anim", "#ffffff", whipSounds);
+var toppings = {
+	butter: {
+		animation: "butter-anim",
+		particleColor: "#fde95e",
+		sounds: popSounds
+	},
+	sugar: {
+		animation: "butter-sugar-anim",
+		particleColor: "#ffffff",
+		sounds: sugarSounds
+	},
+	syrup: {
+		animation: "butter-syrup-anim",
+		particleColor: "#6d511f",
+		sounds: popSounds
+	},
+	blueberry: {
+		animation: "blueberry-anim",
+		particleColor: "#760630",
+		sounds: popSounds
+	},
+	blueberryCream: {
+		animation: "blueberry-cream-anim",
+		particleColor: "#ffffff",
+		sounds: whipSounds
+	},
+	strawberry: {
+		animation: "strawberry-anim",
+		particleColor: "#e33838",
+		sounds: popSounds
+	},
+	strawberryCream: {
+		animation: "strawberry-cream-anim",
+		particleColor: "#ffffff",
+		sounds: whipSounds
+	},
+};
+
+
+var butterOnly = makeLevel.bind(undefined, [toppings.butter]);
+var butterSugar = makeLevel.bind(undefined, [toppings.butter, toppings.sugar]);
+var butterSyrup = makeLevel.bind(undefined, [toppings.butter, toppings.syrup]);
+var blueberryOnly = makeLevel.bind(undefined, [toppings.blueberry]);
+var blueberryCream = makeLevel.bind(undefined, [toppings.blueberry, toppings.blueberryCream]);
+var strawberryOnly = makeLevel.bind(undefined, [toppings.strawberry]);
+var strawberryCream = makeLevel.bind(undefined, [toppings.strawberry, toppings.strawberryCream]);
 
 function randomIntBetween(min, max) {
 	return Math.floor(Math.random() * (max - min + 1) + min);
@@ -401,9 +435,8 @@ function isOdd(num) {
 }
 
 function makeWaffleForLevel() {
-	var filledSquare = game.images.get(levels[level].filledImage);
-	var goalSquare = game.images.get(levels[level].emptyImage);
-	return makeWaffle(levels[level].width, filledSquare, goalSquare, levels[level].emptyPercent);
+	var l = levels[level];
+	return makeWaffle(l.width, l.toppings, l.emptyPercent);
 }
 
 game.scenes.add("main", new Splat.Scene(canvas, function() {
@@ -519,14 +552,15 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 				continue;
 			}
 			touch.consumed = true;
-			if (!square.filled) {
-				playRandomSound(levels[level].fillSounds);
-				square.filled = true;
-				square.sprite = game.animations.get(levels[level].fillAnim).copy();
-				particles.spray(game.mouse.x, game.mouse.y, levels[level].particleColor, 5, 25, 8);
+			if (square.nextToppings.length > 0) {
+				var nextTopping = square.nextToppings.shift();
+				square.lastTopping = nextTopping;
+				playRandomSound(nextTopping.sounds);
+				square.sprite = game.animations.get(nextTopping.animation).copy();
+				particles.spray(game.mouse.x, game.mouse.y, nextTopping.particleColor, 5, 25, 8);
 			} else {
 				game.sounds.play("bad-tap");
-				particles.spray(game.mouse.x, game.mouse.y, levels[level].particleColor, 5, 25, 100);
+				particles.spray(game.mouse.x, game.mouse.y, square.lastTopping.particleColor, 5, 25, 100);
 				// speed up camera as penalty
 				if (this.camera.vx > 0) {
 					this.camera.vx += 0.1;
