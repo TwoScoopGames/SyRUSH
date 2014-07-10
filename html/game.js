@@ -412,8 +412,11 @@ var levels = [];
 function generateLevels() {
 	var l = Math.floor(levels.length / 2);
 	var width = 15 + (4 * l);
-	var speed = 0.20 + (0.02 * l);
-	var empty = 0.3 + (0.05 * l);
+	var speed = 0.25 + (0.01 * l);
+	var empty = 0.3 + (0.03 * l);
+	if (empty > 0.6) {
+		empty = 0.6;
+	}
 
 	var levelSequence = l % 4;
 	if (levelSequence === 0) {
