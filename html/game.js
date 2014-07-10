@@ -520,7 +520,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 			break;
 		}
 		var last = this.squares.splice(currentSquareIndex, 1)[0];
-		if (last.filled) {
+		if (last.nextToppings.length === 0) {
 			if (nextSquare !== undefined && last.x !== nextSquare.x) {
 				this.score++;
 				if (this.score > best) {
