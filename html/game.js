@@ -227,12 +227,13 @@ function drawScoreScreen(context, scene) {
 	});
 }
 
-function makeSquare(x, y, toppings, emptyPercent) {
-	var isFilled = Math.random() > emptyPercent;
-
+function makeSquare(x, y, toppings, emptyPercent, hasEmpty) {
 	var i = toppings.length - 1;
-	while(Math.random() <= emptyPercent && i > -1) {
+	if (Math.random() <= emptyPercent && i > -1) {
 		i--;
+		if (hasEmpty && Math.random() <= 0.1 && i > -1) {
+			i--;
+		}
 	}
 	var image = game.images.get("waffle-hole");
 	if (i >= 0) {
@@ -245,18 +246,18 @@ function makeSquare(x, y, toppings, emptyPercent) {
 	return entity;
 }
 
-function makeSquareColumn(x, toppings, emptyPercent) {
+function makeSquareColumn(x, toppings, emptyPercent, hasEmpty) {
 	var squares = [];
 	for (var y = 0; y < canvas.height; y += tileSize) {
-		squares.unshift(makeSquare(x, y, toppings, emptyPercent));
+		squares.unshift(makeSquare(x, y, toppings, emptyPercent, hasEmpty));
 	}
 	return squares;
 }
 
-function makeWaffle(squaresWide, toppings, emptyPercent) {
+function makeWaffle(squaresWide, toppings, emptyPercent, hasEmpty) {
 	var newSquares = [];
 	for (var i = 0; i < squaresWide; i++) {
-		newSquares = newSquares.concat(makeSquareColumn(i * tileSize, toppings, emptyPercent));
+		newSquares = newSquares.concat(makeSquareColumn(i * tileSize, toppings, emptyPercent, hasEmpty));
 	}
 	return newSquares;
 }
@@ -436,7 +437,7 @@ function isOdd(num) {
 
 function makeWaffleForLevel() {
 	var l = levels[level];
-	return makeWaffle(l.width, l.toppings, l.emptyPercent);
+	return makeWaffle(l.width, l.toppings, l.emptyPercent, level >= 8);
 }
 
 game.scenes.add("main", new Splat.Scene(canvas, function() {
