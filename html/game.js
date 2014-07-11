@@ -7,6 +7,8 @@ if (window.ejecta) {
 	canvas.width = window.innerWidth * (canvas.height / window.innerHeight);
 }
 
+console.log(window.navigator.userAgent);
+
 var manifest = {
 	"images": {
 		"bg-left": "images/bg-left.png",
@@ -241,7 +243,7 @@ function makeSquare(x, y, toppings, emptyPercent, hasEmpty) {
 	}
 
 	var entity = new Splat.AnimatedEntity(x, y, tileSize, tileSize, image, 0, 0);
-	entity.nextToppings = toppings.slice(i+1);
+	entity.nextToppings = toppings.slice(i + 1);
 	entity.lastTopping = toppings[toppings.length - 1];
 	return entity;
 }
