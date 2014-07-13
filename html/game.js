@@ -11,6 +11,7 @@ var manifest = {
 	"images": {
 		"bg-left": "images/bg-left.png",
 		"bg-right": "images/bg-right.png",
+		"next-topping-text": "images/next-topping-text.png",
 		"logo": "images/logo.png",
 		"sound-off": "images/sound-off-icon.png",
 		"sound-on": "images/sound-on-icon.png",
@@ -514,11 +515,13 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 	}, 1000, function() {
 		scene.message.reset();
 		scene.message = undefined;
+		scene.messageText = undefined;
 	});
 
 }, function(elapsedMillis) {
 	if (this.camera.x >= (levels[level].width * tileSize) + game.images.get("bg-right").width - canvas.width && this.camera.vx > 0) {
 		this.message = game.animations.get("next-topping-syrup");
+		this.messageText = game.images.get("next-topping-text");
 		this.timers.banner.reset();
 		this.timers.banner.start();
 		this.nextLevel();
@@ -626,6 +629,9 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		particles.draw(context);
 		if (scene.message) {
 			scene.message.draw(context, (canvas.width / 2) - (scene.message.width / 2), (canvas.height / 2) - (scene.message.height / 2));
+		}
+		if (scene.messageText) {
+			context.drawImage(scene.messageText, (canvas.width / 2) - (scene.messageText.width / 2), (canvas.height / 2) - (scene.messageText.height / 2));
 		}
 	});
 }));
