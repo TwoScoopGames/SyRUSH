@@ -56,33 +56,21 @@ var manifest = {
 	"animations": {
 		"blueberry-anim": {
 			"strip": "images/blueberry-anim.png",
-			"frames": 4,
+			"frames": 5,
 			"msPerFrame": 75,
-			"repeatAt": 3
-		},
-		"blueberry-cream-anim": {
-			"strip": "images/blueberry-cream-anim.png",
-			"frames": 3,
-			"msPerFrame": 75,
-			"repeatAt": 2
+			"repeatAt": 4
 		},
 		"butter-anim": {
 			"strip": "images/butter-anim.png",
-			"frames": 4,
+			"frames": 5,
 			"msPerFrame": 75,
-			"repeatAt": 3
+			"repeatAt": 4
 		},
-		"butter-sugar-anim": {
-			"strip": "images/butter-sugar-anim.png",
-			"frames": 4,
+		"cream-anim": {
+			"strip": "images/cream-anim.png",
+			"frames": 5,
 			"msPerFrame": 75,
-			"repeatAt": 3
-		},
-		"butter-syrup-anim": {
-			"strip": "images/butter-syrup-anim.png",
-			"frames": 4,
-			"msPerFrame": 75,
-			"repeatAt": 3
+			"repeatAt": 4
 		},
 		"next-waffle-anim": {
 			"strip": "images/next-waffle-anim.png",
@@ -98,15 +86,15 @@ var manifest = {
 		},
 		"strawberry-anim": {
 			"strip": "images/strawberry-anim.png",
-			"frames": 4,
+			"frames": 5,
 			"msPerFrame": 75,
-			"repeatAt": 3
+			"repeatAt": 4
 		},
-		"strawberry-cream-anim": {
-			"strip": "images/strawberry-cream-anim.png",
-			"frames": 4,
+		"sugar-anim": {
+			"strip": "images/sugar-anim.png",
+			"frames": 5,
 			"msPerFrame": 75,
-			"repeatAt": 3
+			"repeatAt": 4
 		},
 		"syrup-anim": {
 			"strip": "images/syrup-anim.png",
@@ -390,28 +378,18 @@ var whipSounds = ["whip1", "whip2", "whip3", "whip4", "whip5", "whip6", "whip7",
 var sugarSounds = ["sugar1", "sugar2"];
 
 var toppings = {
-	butter: {
-		animation: "butter-anim",
-		particleColor: "#fde95e",
-		sounds: popSounds
-	},
-	sugar: {
-		animation: "butter-sugar-anim",
-		particleColor: "#ffffff",
-		sounds: sugarSounds
-	},
-	syrup: {
-		animation: "butter-syrup-anim",
-		particleColor: "#6d511f",
-		sounds: popSounds
-	},
 	blueberry: {
 		animation: "blueberry-anim",
 		particleColor: "#760630",
 		sounds: popSounds
 	},
-	blueberryCream: {
-		animation: "blueberry-cream-anim",
+	butter: {
+		animation: "butter-anim",
+		particleColor: "#fde95e",
+		sounds: popSounds
+	},
+	cream: {
+		animation: "cream-anim",
 		particleColor: "#ffffff",
 		sounds: whipSounds
 	},
@@ -420,10 +398,15 @@ var toppings = {
 		particleColor: "#e33838",
 		sounds: popSounds
 	},
-	strawberryCream: {
-		animation: "strawberry-cream-anim",
+	sugar: {
+		animation: "sugar-anim",
 		particleColor: "#ffffff",
-		sounds: whipSounds
+		sounds: sugarSounds
+	},
+	syrup: {
+		animation: "syrup-anim",
+		particleColor: "#6d511f",
+		sounds: popSounds
 	},
 };
 
@@ -432,9 +415,9 @@ var butterOnly = makeLevel.bind(undefined, [toppings.butter]);
 var butterSugar = makeLevel.bind(undefined, [toppings.butter, toppings.sugar]);
 var butterSyrup = makeLevel.bind(undefined, [toppings.butter, toppings.syrup]);
 var blueberryOnly = makeLevel.bind(undefined, [toppings.blueberry]);
-var blueberryCream = makeLevel.bind(undefined, [toppings.blueberry, toppings.blueberryCream]);
+var blueberryCream = makeLevel.bind(undefined, [toppings.blueberry, toppings.cream]);
 var strawberryOnly = makeLevel.bind(undefined, [toppings.strawberry]);
-var strawberryCream = makeLevel.bind(undefined, [toppings.strawberry, toppings.strawberryCream]);
+var strawberryCream = makeLevel.bind(undefined, [toppings.strawberry, toppings.cream]);
 
 function randomIntBetween(min, max) {
 	return Math.floor(Math.random() * (max - min + 1) + min);
