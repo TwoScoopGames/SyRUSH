@@ -84,11 +84,17 @@ var manifest = {
 			"msPerFrame": 50,
 			"repeatAt": 7
 		},
-		"next-topping-anim": {
-			"strip": "images/next-topping-anim.png",
+		"next-topping-sugar": {
+			"strip": "images/next-topping-sugar.png",
 			"frames": 7,
 			"msPerFrame": 50,
 			"repeatAt": 6
+		},
+		"next-topping-syrup": {
+			"strip": "images/next-topping-syrup.png",
+			"frames": 6,
+			"msPerFrame": 50,
+			"repeatAt": 5
 		},
 		"strawberry-anim": {
 			"strip": "images/strawberry-anim.png",
@@ -503,25 +509,16 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 	});
 	var scene = this;
 
-	this.timers.banner = new Splat.Timer(null, 1000, function() {
-		scene.message = "";
+	this.timers.banner = new Splat.Timer(function(elapsedMillis) {
+		scene.message.move(elapsedMillis);
+	}, 1000, function() {
+		scene.message.reset();
+		scene.message = undefined;
 	});
 
 }, function(elapsedMillis) {
-	var nextTopping = game.animations.get("next-topping-anim");
-	var nextWaffle = game.animations.get("next-waffle-anim");
-	nextWaffle.move(elapsedMillis);
-	nextTopping.move(elapsedMillis);
-	if (this.message != "Next waffle!") {
-		nextWaffle.reset();
-	}
-	if (this.message != "Next topping!") {
-		nextTopping.reset();
-	}
-
-	var scene = this;
 	if (this.camera.x >= (levels[level].width * tileSize) + game.images.get("bg-right").width - canvas.width && this.camera.vx > 0) {
-		this.message = "Next topping!";
+		this.message = game.animations.get("next-topping-syrup");
 		this.timers.banner.reset();
 		this.timers.banner.start();
 		this.nextLevel();
@@ -530,8 +527,8 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		this.camera.x = -game.images.get("bg-left").width;
 		this.camera.vx = 0;
 		game.sounds.play("yay");
-		scene.nextLevel();
-		this.message = "Next waffle!";
+		this.nextLevel();
+		this.message = game.animations.get("next-waffle-anim");
 		this.timers.banner.reset();
 		this.timers.banner.start();
 	}
@@ -544,6 +541,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 
 	var movingRight = this.camera.vx > 0;
 
+	var scene = this;
 	function isOffScreen(entity) {
 		return movingRight ? entity.x + entity.width < scene.camera.x : entity.x > scene.camera.x + scene.camera.width;
 	}
@@ -626,13 +624,8 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		context.font = "100px lato";
 		centerText(context, scene.score, 0, 100);
 		particles.draw(context);
-		if (scene.message === "Next waffle!") {
-			var nextWaffle = game.animations.get("next-waffle-anim");
-			nextWaffle.draw(context, (canvas.width / 2) - (nextWaffle.width / 2), (canvas.height / 2) - (nextWaffle.height / 2));
-		}
-		if (scene.message === "Next topping!") {
-			var nextTopping = game.animations.get("next-topping-anim");
-			nextTopping.draw(context, (canvas.width / 2) - (nextTopping.width / 2), 0);
+		if (scene.message) {
+			scene.message.draw(context, (canvas.width / 2) - (scene.message.width / 2), (canvas.height / 2) - (scene.message.height / 2));
 		}
 	});
 }));
