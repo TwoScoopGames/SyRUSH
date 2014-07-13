@@ -97,6 +97,12 @@ var manifest = {
 			"msPerFrame": 50,
 			"repeatAt": 5
 		},
+		"next-topping-whip": {
+			"strip": "images/next-topping-syrup.png",
+			"frames": 6,
+			"msPerFrame": 50,
+			"repeatAt": 5
+		},
 		"strawberry-anim": {
 			"strip": "images/strawberry-anim.png",
 			"frames": 5,
@@ -409,7 +415,8 @@ var toppings = {
 	cream: {
 		animation: "cream-anim",
 		particleColor: "#ffffff",
-		sounds: whipSounds
+		sounds: whipSounds,
+		nextAnim: "next-topping-whip"
 	},
 	strawberry: {
 		animation: "strawberry-anim",
@@ -419,12 +426,14 @@ var toppings = {
 	sugar: {
 		animation: "sugar-anim",
 		particleColor: "#ffffff",
-		sounds: sugarSounds
+		sounds: sugarSounds,
+		nextAnim: "next-topping-sugar"
 	},
 	syrup: {
 		animation: "syrup-anim",
 		particleColor: "#6d511f",
-		sounds: popSounds
+		sounds: popSounds,
+		nextAnim: "next-topping-syrup"
 	},
 };
 
@@ -520,11 +529,11 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 
 }, function(elapsedMillis) {
 	if (this.camera.x >= (levels[level].width * tileSize) + game.images.get("bg-right").width - canvas.width && this.camera.vx > 0) {
-		this.message = game.animations.get("next-topping-syrup");
+		this.nextLevel();
+		this.message = game.animations.get(levels[level].toppings[1].nextAnim);
 		this.messageText = game.images.get("next-topping-text");
 		this.timers.banner.reset();
 		this.timers.banner.start();
-		this.nextLevel();
 	}
 	if (this.camera.x < -game.images.get("bg-left").width && this.camera.vx < 0) {
 		this.camera.x = -game.images.get("bg-left").width;
