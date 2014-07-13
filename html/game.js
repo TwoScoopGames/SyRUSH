@@ -66,6 +66,12 @@ var manifest = {
 			"msPerFrame": 75,
 			"repeatAt": 4
 		},
+		"chip-anim": {
+			"strip": "images/chip-anim.png",
+			"frames": 5,
+			"msPerFrame": 75,
+			"repeatAt": 4
+		},
 		"cream-anim": {
 			"strip": "images/cream-anim.png",
 			"frames": 5,
@@ -388,6 +394,11 @@ var toppings = {
 		particleColor: "#fde95e",
 		sounds: popSounds
 	},
+	chip: {
+		animation: "chip-anim",
+		particleColor: "#513218",
+		sounds: popSounds
+	},
 	cream: {
 		animation: "cream-anim",
 		particleColor: "#ffffff",
@@ -418,6 +429,8 @@ var blueberryOnly = makeLevel.bind(undefined, [toppings.blueberry]);
 var blueberryCream = makeLevel.bind(undefined, [toppings.blueberry, toppings.cream]);
 var strawberryOnly = makeLevel.bind(undefined, [toppings.strawberry]);
 var strawberryCream = makeLevel.bind(undefined, [toppings.strawberry, toppings.cream]);
+var chipOnly = makeLevel.bind(undefined, [toppings.chip]);
+var chipCream = makeLevel.bind(undefined, [toppings.chip, toppings.cream]);
 
 function randomIntBetween(min, max) {
 	return Math.floor(Math.random() * (max - min + 1) + min);
@@ -435,7 +448,7 @@ function generateLevels() {
 		empty = 0.6;
 	}
 
-	var levelSequence = l % 4;
+	var levelSequence = l % 5;
 	if (levelSequence === 0) {
 		levels.push(butterOnly(width, speed, empty));
 		levels.push(butterSyrup(width, -speed, empty));
@@ -445,9 +458,12 @@ function generateLevels() {
 	} else if (levelSequence === 2) {
 		levels.push(butterOnly(width, speed, empty));
 		levels.push(butterSugar(width, -speed, empty));
-	} else {
+	} else if (levelSequence === 3) {
 		levels.push(strawberryOnly(width, speed, empty));
 		levels.push(strawberryCream(width, -speed, empty));
+	} else {
+		levels.push(chipOnly(width, speed, empty));
+		levels.push(chipCream(width, -speed, empty));
 	}
 }
 
