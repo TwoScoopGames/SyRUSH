@@ -7,8 +7,6 @@ if (window.ejecta) {
 	canvas.width = window.innerWidth * (canvas.height / window.innerHeight);
 }
 
-console.log(window.navigator.userAgent);
-
 var manifest = {
 	"images": {
 		"bg-left": "images/bg-left.png",
@@ -230,23 +228,57 @@ function drawScoreScreen(context, scene) {
 }
 
 function makeSquare(x, y, toppings, emptyPercent, hasEmpty) {
-	var i = toppings.length - 1;
-	if (Math.random() <= emptyPercent && i > -1) {
+	var i = toppings.length;
+	if (Math.random() <= emptyPercent && i > 0) {
 		i--;
-		if (hasEmpty && Math.random() <= 0.1 && i > -1) {
+		if (hasEmpty && Math.random() <= 0.1 && i > 0) {
 			i--;
 		}
 	}
-	var image = game.images.get("waffle-hole");
-	if (i >= 0) {
-		image = game.animations.get(toppings[i].animation).copy();
+
+	return new Square(x, y, tileSize, tileSize, toppings, i);
+}
+
+function Square(x, y, width, height, toppings, nextTopping) {
+	Splat.Entity.call(this, x, y, width, height);
+	this.toppings = toppings.slice(0);
+	this.animations = toppings.map(function(t) {
+		return game.animations.get(t.animation).copy();
+	});
+	this.nextTopping = nextTopping;
+}
+Square.prototype = Object.create(Splat.Entity.prototype);
+Square.prototype.move = function(elapsedMillis) {
+	for (var i = 0; i < this.nextTopping; i++) {
+		this.animations[i].move(elapsedMillis);
+	}
+};
+Square.prototype.draw = function(context) {
+	var waffle = game.images.get("waffle-hole");
+	context.drawImage(waffle, this.x, this.y);
+	for (var i = 0; i < this.nextTopping; i++) {
+		this.animations[i].draw(context, this.x, this.y);
+	}
+};
+Square.prototype.isFinished = function() {
+	return this.nextTopping === this.toppings.length;
+};
+Square.prototype.next = function() {
+	if (this.isFinished()) {
+		return;
 	}
 
-	var entity = new Splat.AnimatedEntity(x, y, tileSize, tileSize, image, 0, 0);
-	entity.nextToppings = toppings.slice(i + 1);
-	entity.lastTopping = toppings[toppings.length - 1];
-	return entity;
-}
+	var topping = this.toppings[this.nextTopping];
+	this.nextTopping++;
+
+	playRandomSound(topping.sounds);
+	particles.spray(game.mouse.x, game.mouse.y, topping.particleColor, 5, 25, 8);
+};
+Square.prototype.bad = function() {
+	game.sounds.play("bad-tap");
+	var topping = this.toppings[this.nextTopping - 1];
+	particles.spray(game.mouse.x, game.mouse.y, topping.particleColor, 5, 25, 100);
+};
 
 function makeSquareColumn(x, toppings, emptyPercent, hasEmpty) {
 	var squares = [];
@@ -526,7 +558,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 			break;
 		}
 		var last = this.squares.splice(currentSquareIndex, 1)[0];
-		if (last.nextToppings.length === 0) {
+		if (last.isFinished()) {
 			if (nextSquare !== undefined && last.x !== nextSquare.x) {
 				this.score++;
 				if (this.score > best) {
@@ -558,21 +590,16 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 				continue;
 			}
 			touch.consumed = true;
-			if (square.nextToppings.length > 0) {
-				var nextTopping = square.nextToppings.shift();
-				square.lastTopping = nextTopping;
-				playRandomSound(nextTopping.sounds);
-				square.sprite = game.animations.get(nextTopping.animation).copy();
-				particles.spray(game.mouse.x, game.mouse.y, nextTopping.particleColor, 5, 25, 8);
-			} else {
-				game.sounds.play("bad-tap");
-				particles.spray(game.mouse.x, game.mouse.y, square.lastTopping.particleColor, 5, 25, 100);
+			if (square.isFinished()) {
+				square.bad();
 				// speed up camera as penalty
 				if (this.camera.vx > 0) {
 					this.camera.vx += 0.1;
 				} else {
 					this.camera.vx -= 0.1;
 				}
+			} else {
+				square.next();
 			}
 		}
 	}
