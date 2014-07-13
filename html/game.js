@@ -323,7 +323,7 @@ function isInside(container, x, y) {
   ===========================================*/
 
 game.scenes.add("title", new Splat.Scene(canvas, function() {
-	this.timers.running = new Splat.Timer(null, 1, function() {
+	this.timers.running = new Splat.Timer(null, 2000, function() {
 		Splat.ads.show(false);
 		game.scenes.switchTo("game-title");
 	});
