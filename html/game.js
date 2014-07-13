@@ -79,29 +79,29 @@ var manifest = {
 			"msPerFrame": 75,
 			"repeatAt": 4
 		},
-		"next-waffle-anim": {
-			"strip": "images/next-waffle-anim.png",
-			"frames": 8,
-			"msPerFrame": 50,
-			"repeatAt": 7
+		"next-topping-cream": {
+			"strip": "images/next-topping-cream.png",
+			"frames": 6,
+			"msPerFrame": 100,
+			"repeatAt": 5
 		},
 		"next-topping-sugar": {
 			"strip": "images/next-topping-sugar.png",
 			"frames": 7,
-			"msPerFrame": 50,
+			"msPerFrame": 100,
 			"repeatAt": 6
 		},
 		"next-topping-syrup": {
 			"strip": "images/next-topping-syrup.png",
 			"frames": 6,
-			"msPerFrame": 50,
+			"msPerFrame": 100,
 			"repeatAt": 5
 		},
-		"next-topping-whip": {
-			"strip": "images/next-topping-syrup.png",
-			"frames": 6,
+		"next-waffle-anim": {
+			"strip": "images/next-waffle-anim.png",
+			"frames": 8,
 			"msPerFrame": 50,
-			"repeatAt": 5
+			"repeatAt": 7
 		},
 		"strawberry-anim": {
 			"strip": "images/strawberry-anim.png",
@@ -416,7 +416,7 @@ var toppings = {
 		animation: "cream-anim",
 		particleColor: "#ffffff",
 		sounds: whipSounds,
-		nextAnim: "next-topping-whip"
+		nextAnim: "next-topping-cream"
 	},
 	strawberry: {
 		animation: "strawberry-anim",
