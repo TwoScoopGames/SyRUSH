@@ -162,13 +162,30 @@ function setBest() {
 	}, function(err) {});
 }
 
-function Particles() {
+function Particles(max) {
 	this.particles = [];
+	for (var i = 0; i < max; i++) {
+		this.particles.push({
+			x: 0,
+			y: 0,
+			vx: 0,
+			vy: 0,
+			radius: 0,
+			color: "#ffffff",
+			stroke: "#ffffff",
+			enabled: false,
+			age: 0
+		});
+	}
 	this.gravity = 0.2;
 }
 Particles.prototype.move = function(elapsedMillis) {
 	for (var i = 0; i < this.particles.length; i++) {
 		var particle = this.particles[i];
+		if (!particle.enabled) {
+			continue;
+		}
+		particle.age += elapsedMillis;
 		particle.x += particle.vx * elapsedMillis;
 		particle.y += particle.vy * elapsedMillis;
 		particle.vy += this.gravity;
@@ -177,24 +194,30 @@ Particles.prototype.move = function(elapsedMillis) {
 Particles.prototype.draw = function(context) {
 	for (var i = 0; i < this.particles.length; i++) {
 		var particle = this.particles[i];
+		if (!particle.enabled) {
+			continue;
+		}
 		drawCircle(context, particle.color, particle.radius, particle.stroke, 0, particle.x, particle.y);
 	}
 };
 Particles.prototype.spray = function(x, y, color, velocity, radius, quantity) {
-	this.particles = [];
-	for (var q = 0; q < quantity; q++) {
-		this.particles.push({
-			x: x,
-			y: y,
-			vx: (Math.random() - 0.5) * velocity,
-			vy: (Math.random() - 0.5) * velocity,
-			radius: Math.random() * radius,
-			color: color,
-			stroke: color
-		});
+	for (var q = 0; q < this.particles.length; q++) {
+		var particle = this.particles[q];
+		if (q >= quantity) {
+			particle.enabled = false;
+			continue;
+		}
+		particle.enabled = true;
+		particle.x = x;
+		particle.y = y;
+		particle.vx = (Math.random() - 0.5) * velocity;
+		particle.vy = (Math.random() - 0.5) * velocity;
+		particle.radius = Math.random() * radius;
+		particle.color = color;
+		particle.stroke = color;
 	}
 };
-var particles = new Particles();
+var particles = new Particles(100);
 
 function drawCircle(context, color, radius, strokeColor, strokeSize, x, y) {
 	context.beginPath();
