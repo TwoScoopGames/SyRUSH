@@ -132,9 +132,6 @@ var manifest = {
 
 var game = new Splat.Game(canvas, manifest);
 var godmode = false;
-var score = 0;
-var best = 0;
-var newBest = false;
 var syrupParticles = [];
 var gravity = 0.2;
 var tileSize = 200;
