@@ -408,6 +408,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		this.startButton.move(elapsedMillis);
 	}
 	if (this.startPushed && !game.mouse.isPressed(0)) {
+		game.mouse.onmouseup = undefined;
 		this.startButton.move(elapsedMillis);
 		game.sounds.play("music", true);
 		Splat.ads.hide();
