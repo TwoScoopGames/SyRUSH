@@ -390,8 +390,8 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	this.startButton.draw(context, (canvas.width / 2) - (this.startButton.width / 2), 700);
 
 	context.fillStyle = "#fff";
-	context.font = "50px lato";
-	centerText(context, "Music by Glass Boy", 0, canvas.height - 60);
+	context.font = "40px lato";
+	context.fillText("Music by Glass Boy", 20, canvas.height - 30);
 
 	var scoreMessage = "Best: " + best;
 	if (this.showLastScore) {
