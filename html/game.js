@@ -136,6 +136,7 @@ var syrupParticles = [];
 var gravity = 0.2;
 var tileSize = 200;
 
+var lastScore = -1;
 var best = 0;
 
 function getBest() {
@@ -339,7 +340,14 @@ game.scenes.add("title", new Splat.Scene(canvas, function() {
 }));
 
 game.scenes.add("game-title", new Splat.Scene(canvas, function() {
-
+	this.showLastScore = true;
+	var scene = this;
+	this.timers.score = new Splat.Timer(undefined, 2000, function() {
+		scene.showLastScore = lastScore !== -1 && !scene.showLastScore;
+		this.reset();
+		this.start();
+	});
+	this.timers.score.start();
 }, function(elapsedMillis) {
 	if (game.mouse.consumePressed(0, (canvas.width - 115), Splat.ads.height, 115, 109)) {
 		game.sounds.muted = !game.sounds.muted;
@@ -354,30 +362,34 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		game.scenes.switchTo("main");
 	}
 }, function(context) {
-	this.camera.drawAbsolute(context, function() {
-		var titleBackground = game.images.get("title-background");
-		for (var x = 0; x < canvas.width; x += titleBackground.width) {
-			context.drawImage(titleBackground, x, 0);
-		}
+	var titleBackground = game.images.get("title-background");
+	for (var x = 0; x < canvas.width; x += titleBackground.width) {
+		context.drawImage(titleBackground, x, 0);
+	}
 
-		var logo = game.images.get("logo");
-		context.drawImage(logo, (canvas.width / 2) - (logo.width / 2), 200);
+	var logo = game.images.get("logo");
+	context.drawImage(logo, (canvas.width / 2) - (logo.width / 2), 200);
 
-		var startButton = game.images.get("start-button");
-		context.drawImage(startButton, (canvas.width / 2) - (startButton.width / 2), 700);
+	var startButton = game.images.get("start-button");
+	context.drawImage(startButton, (canvas.width / 2) - (startButton.width / 2), 700);
 
-		context.fillStyle = "#fff";
-		context.font = "50px lato";
-		centerText(context, "Music by Glass Boy", 0, canvas.height - 60);
+	context.fillStyle = "#fff";
+	context.font = "50px lato";
+	centerText(context, "Music by Glass Boy", 0, canvas.height - 60);
 
-		var soundSwitch;
-		if (game.sounds.muted) {
-			soundSwitch = game.images.get("sound-off");
-		} else {
-			soundSwitch = game.images.get("sound-on");
-		}
-		context.drawImage(soundSwitch, (canvas.width - soundSwitch.width), Splat.ads.height);
-	});
+	var scoreMessage = "Best: " + best;
+	if (this.showLastScore) {
+		scoreMessage = "Last: " + lastScore;
+	}
+	centerText(context, scoreMessage, 0, 614);
+
+	var soundSwitch;
+	if (game.sounds.muted) {
+		soundSwitch = game.images.get("sound-off");
+	} else {
+		soundSwitch = game.images.get("sound-on");
+	}
+	context.drawImage(soundSwitch, (canvas.width - soundSwitch.width), Splat.ads.height);
 }));
 
 function makeLevel(toppings, width, speed, emptyPercent) {
@@ -510,11 +522,12 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 	}.bind(this);
 	this.nextLevel();
 
+	var scene = this;
 	this.timers.fadeToBlack = new Splat.Timer(null, 1000, function() {
+		lastScore = scene.score;
 		level = -1;
 		game.scenes.switchTo("game-title");
 	});
-	var scene = this;
 
 	this.timers.banner = new Splat.Timer(function(elapsedMillis) {
 		scene.message.move(elapsedMillis);
@@ -567,9 +580,9 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		if (last.isFinished()) {
 			if (nextSquare !== undefined && last.x !== nextSquare.x) {
 				this.score++;
-				if (this.score > best) {
-					best = this.score;
-					this.newBest = true;
+				if (scene.score > best) {
+					best = scene.score;
+					scene.newBest = true;
 					setBest();
 				}
 			}
