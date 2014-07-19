@@ -393,11 +393,13 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	context.font = "40px lato";
 	context.fillText("Music by Glass Boy", 20, canvas.height - 30);
 
+	context.fillStyle = "#553013";
+	context.font = "60px lato";
 	var scoreMessage = "Best: " + best;
 	if (this.showLastScore) {
 		scoreMessage = "Last: " + lastScore;
 	}
-	centerText(context, scoreMessage, 0, 614);
+	centerText(context, scoreMessage, 0, 580);
 
 	var soundSwitch;
 	if (game.sounds.muted) {
