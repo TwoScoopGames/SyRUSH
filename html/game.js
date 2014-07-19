@@ -46,11 +46,11 @@ var manifest = {
 		"whip10": "sound/whip-10.mp3",
 	},
 	"fonts": {
-		"lato": {
-			"embedded-opentype": "font/lato.eot",
-			"woff": "font/lato.woff",
-			"truetype": "font/Lato.ttf",
-			"svg": "font/lato.svg#lato"
+		"syrup": {
+			"embedded-opentype": "font/syrup.eot",
+			"woff": "font/syrup.woff",
+			"truetype": "font/syrup.ttf",
+			"svg": "font/syrup.svg#syrup"
 		}
 	},
 	"animations": {
@@ -243,11 +243,11 @@ function drawScoreScreen(context, scene) {
 		context.fillStyle = "rgba(0, 0, 0, " + opacity + ")";
 		context.fillRect(0, 0, canvas.width, canvas.height);
 		context.fillStyle = "#ffffff";
-		context.font = "50px lato";
+		context.font = "50px syrup";
 		centerText(context, "SCORE", 0, 300);
-		context.font = "100px lato";
+		context.font = "100px syrup";
 		centerText(context, scene.score, 0, 400);
-		context.font = "50px lato";
+		context.font = "50px syrup";
 		if (scene.newBest) {
 			context.fillStyle = "#be4682";
 			centerText(context, "NEW BEST!", 0, 600);
@@ -255,7 +255,7 @@ function drawScoreScreen(context, scene) {
 			centerText(context, "BEST", 0, 600);
 		}
 
-		context.font = "100px lato";
+		context.font = "100px syrup";
 		centerText(context, best, 0, 700);
 	});
 }
@@ -361,7 +361,7 @@ game.scenes.add("title", new Splat.Scene(canvas, function() {
 	context.fillRect(0, 0, canvas.width, canvas.height);
 	var anim = game.animations.get("two-scoop");
 	context.fillStyle = "#ffffff";
-	context.font = "50px lato";
+	context.font = "50px syrup";
 	centerText(context, "Two Scoop Games", 0, (canvas.height / 2) + (anim.height / 2) + 30);
 
 	anim.draw(context, (canvas.width / 2) - (anim.width / 2), (canvas.height / 2) - (anim.height / 2));
@@ -416,16 +416,16 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	this.startButton.draw(context, (canvas.width / 2) - (this.startButton.width / 2), 700);
 
 	context.fillStyle = "#fff";
-	context.font = "40px lato";
+	context.font = "40px syrup";
 	context.fillText("Music by Glass Boy", 20, canvas.height - 30);
 
 	context.fillStyle = "#553013";
-	context.font = "60px lato";
+	context.font = "80px syrup";
 	var scoreMessage = "Best: " + best;
 	if (this.showLastScore) {
 		scoreMessage = "Last: " + lastScore;
 	}
-	centerText(context, scoreMessage, 0, 580);
+	centerText(context, scoreMessage, 0, 590);
 
 	var soundSwitch;
 	if (game.sounds.muted) {
@@ -689,7 +689,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 	var scene = this;
 	this.camera.drawAbsolute(context, function() {
 		context.fillStyle = "#ffffff";
-		context.font = "100px lato";
+		context.font = "100px syrup";
 		centerText(context, scene.score, 0, 100);
 		particles.draw(context);
 		if (scene.message) {
