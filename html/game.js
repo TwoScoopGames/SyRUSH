@@ -378,6 +378,15 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	});
 	this.timers.score.start();
 	this.startButton = game.animations.get("start-button").copy();
+
+	game.mouse.onmouseup = function(x, y) {
+		if (x < 344 && y > 1039) {
+			Splat.openUrl("http://boyofglass.com/");
+		}
+		if (x > 420 && y > 1039) {
+			Splat.openUrl("http://twoscoopgames.com/");
+		}
+	};
 }, function(elapsedMillis) {
 	if (game.mouse.isPressed(0, (canvas.width - 115), Splat.ads.height, 115, 109)) {
 		game.sounds.muted = !game.sounds.muted;
