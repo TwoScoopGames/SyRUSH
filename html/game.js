@@ -363,11 +363,14 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		}
 	}
 
+	particles.move(elapsedMillis);
+
 	var buttonX = (canvas.width / 2) - (this.startButton.width / 2);
 	var buttonY = 700;
 	if (!this.startPushed && game.mouse.isPressed(0, buttonX, buttonY, this.startButton.width, this.startButton.height)) {
 		this.startPushed = true;
-		game.sounds.play("button");
+		game.sounds.play("bad-tap");
+		particles.spray(game.mouse.x, game.mouse.y, "#6d511f", 5, 25, 100);
 	}
 	if (this.startPushed) {
 		this.startButton.move(elapsedMillis);
@@ -408,6 +411,8 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		soundSwitch = game.images.get("sound-on");
 	}
 	context.drawImage(soundSwitch, (canvas.width - soundSwitch.width), Splat.ads.height);
+
+	particles.draw(context);
 }));
 
 function makeLevel(toppings, width, speed, emptyPercent) {
