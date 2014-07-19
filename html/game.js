@@ -15,7 +15,6 @@ var manifest = {
 		"logo": "images/logo.png",
 		"sound-off": "images/sound-off-icon.png",
 		"sound-on": "images/sound-on-icon.png",
-		"start-button": "images/start-button.png",
 		"title-background": "images/title-background.png",
 		"waffle-hole": "images/waffle-hole.png",
 	},
@@ -102,6 +101,12 @@ var manifest = {
 			"frames": 8,
 			"msPerFrame": 50,
 			"repeatAt": 7
+		},
+		"start-button": {
+			"strip": "images/start-button-f5.png",
+			"frames": 5,
+			"msPerFrame": 25,
+			"repeatAt": 4
 		},
 		"strawberry-anim": {
 			"strip": "images/strawberry-anim.png",
@@ -349,6 +354,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		this.start();
 	});
 	this.timers.score.start();
+	this.startButton = game.animations.get("start-button").copy();
 }, function(elapsedMillis) {
 	if (game.mouse.isPressed(0, (canvas.width - 115), Splat.ads.height, 115, 109)) {
 		game.sounds.muted = !game.sounds.muted;
@@ -357,14 +363,17 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		}
 	}
 
-	var startButton = game.images.get("start-button");
-	var buttonX = (canvas.width / 2) - (startButton.width / 2);
+	var buttonX = (canvas.width / 2) - (this.startButton.width / 2);
 	var buttonY = 700;
-	if (!this.startPushed && game.mouse.isPressed(0, buttonX, buttonY, startButton.width, startButton.height)) {
+	if (!this.startPushed && game.mouse.isPressed(0, buttonX, buttonY, this.startButton.width, this.startButton.height)) {
 		this.startPushed = true;
 		game.sounds.play("button");
 	}
+	if (this.startPushed) {
+		this.startButton.move(elapsedMillis);
+	}
 	if (this.startPushed && !game.mouse.isPressed(0)) {
+		this.startButton.move(elapsedMillis);
 		game.sounds.play("music", true);
 		Splat.ads.hide();
 		game.scenes.switchTo("main");
@@ -378,12 +387,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	var logo = game.images.get("logo");
 	context.drawImage(logo, (canvas.width / 2) - (logo.width / 2), 200);
 
-	var startButton = game.images.get("start-button");
-	var buttonY = 700;
-	if (this.startPushed) {
-		buttonY += 10;
-	}
-	context.drawImage(startButton, (canvas.width / 2) - (startButton.width / 2), buttonY);
+	this.startButton.draw(context, (canvas.width / 2) - (this.startButton.width / 2), 700);
 
 	context.fillStyle = "#fff";
 	context.font = "50px lato";
