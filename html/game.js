@@ -340,7 +340,8 @@ game.scenes.add("title", new Splat.Scene(canvas, function() {
 }));
 
 game.scenes.add("game-title", new Splat.Scene(canvas, function() {
-	this.showLastScore = true;
+	this.showLastScore = false;
+	this.startPushed = false;
 	var scene = this;
 	this.timers.score = new Splat.Timer(undefined, 2000, function() {
 		scene.showLastScore = lastScore !== -1 && !scene.showLastScore;
@@ -349,14 +350,21 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	});
 	this.timers.score.start();
 }, function(elapsedMillis) {
-	if (game.mouse.consumePressed(0, (canvas.width - 115), Splat.ads.height, 115, 109)) {
+	if (game.mouse.isPressed(0, (canvas.width - 115), Splat.ads.height, 115, 109)) {
 		game.sounds.muted = !game.sounds.muted;
 		if (game.sounds.muted) {
 			game.sounds.stop("music");
 		}
 	}
-	if (game.mouse.consumePressed(0)) {
+
+	var startButton = game.images.get("start-button");
+	var buttonX = (canvas.width / 2) - (startButton.width / 2);
+	var buttonY = 700;
+	if (!this.startPushed && game.mouse.isPressed(0, buttonX, buttonY, startButton.width, startButton.height)) {
+		this.startPushed = true;
 		game.sounds.play("button");
+	}
+	if (this.startPushed && !game.mouse.isPressed(0)) {
 		game.sounds.play("music", true);
 		Splat.ads.hide();
 		game.scenes.switchTo("main");
@@ -371,7 +379,11 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	context.drawImage(logo, (canvas.width / 2) - (logo.width / 2), 200);
 
 	var startButton = game.images.get("start-button");
-	context.drawImage(startButton, (canvas.width / 2) - (startButton.width / 2), 700);
+	var buttonY = 700;
+	if (this.startPushed) {
+		buttonY += 10;
+	}
+	context.drawImage(startButton, (canvas.width / 2) - (startButton.width / 2), buttonY);
 
 	context.fillStyle = "#fff";
 	context.font = "50px lato";
