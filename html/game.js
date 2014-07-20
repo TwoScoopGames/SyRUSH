@@ -16,6 +16,7 @@ var manifest = {
 		"sound-off": "images/sound-off-icon.png",
 		"sound-on": "images/sound-on-icon.png",
 		"title-background": "images/title-background.png",
+		"twoscoop-logo-small": "images/twoscoop-logo-small.png",
 		"waffle-hole": "images/waffle-hole.png",
 	},
 	"sounds": {
@@ -383,7 +384,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		if (x < 344 && y > 1039) {
 			Splat.openUrl("http://boyofglass.com/");
 		}
-		if (x > 420 && y > 1039) {
+		if (x > canvas.width - 220 && y > 1039) {
 			Splat.openUrl("http://twoscoopgames.com/");
 		}
 	};
@@ -428,6 +429,9 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	context.fillStyle = "#fff";
 	context.font = "40px syrup";
 	context.fillText("Music by Glass Boy", 20, canvas.height - 30);
+
+	var twoScoopLogo = game.images.get("twoscoop-logo-small");
+	context.drawImage(twoScoopLogo, canvas.width - twoScoopLogo.width, canvas.height - twoScoopLogo.height);
 
 	context.fillStyle = "#553013";
 	context.font = "80px syrup";
