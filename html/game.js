@@ -383,9 +383,11 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 
 	game.mouse.onmouseup = function(x, y) {
 		if (x < 344 && y > 1039) {
+			playRandomSound(popSounds);
 			Splat.openUrl("http://boyofglass.com/");
 		}
 		if (x > canvas.width - 220 && y > 1039) {
+			playRandomSound(popSounds);
 			Splat.openUrl("http://twoscoopgames.com/");
 		}
 	};
@@ -394,6 +396,8 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		game.sounds.muted = !game.sounds.muted;
 		if (game.sounds.muted) {
 			game.sounds.stop("music");
+		} else {
+			playRandomSound(popSounds);
 		}
 	}
 
