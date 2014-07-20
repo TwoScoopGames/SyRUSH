@@ -49,6 +49,12 @@ var manifest = {
 		"whip10": "sound/whip-10.mp3",
 	},
 	"fonts": {
+		"bebasneue": {
+			"embedded-opentype": "font/bebasneue-webfont.eot",
+			"woff": "font/bebasneue-webfont.woff",
+			"truetype": "font/bebasneue-webfont.ttf",
+			"svg": "font/bebasneue-webfont.svg#bebasneue"
+		},
 		"olivier": {
 			"embedded-opentype": "font/olivier.eot",
 			"woff": "font/olivier.woff",
@@ -460,11 +466,17 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 
 	context.fillStyle = "#553013";
 	context.font = "80px olivier";
-	var scoreMessage = "Best: " + best;
 	if (this.showLastScore) {
-		scoreMessage = "Last: " + score;
+		context.fillText("Last:", cavityX + 40, 590);
+		context.font = "80px bebasneue";
+		var w = context.measureText(score).width;
+		context.fillText(score, cavityX + scoreCavity.width - w - 40, 590);
+	} else {
+		context.fillText("Best:", cavityX + 40, 590);
+		context.font = "80px bebasneue";
+		var w = context.measureText(best).width;
+		context.fillText(best, cavityX + scoreCavity.width - w - 40, 590);
 	}
-	centerText(context, scoreMessage, 0, 590);
 
 	var soundSwitch;
 	if (game.sounds.muted) {
@@ -785,7 +797,7 @@ game.scenes.add("score", new Splat.Scene(canvas, function() {
 		context.fillStyle = "#ffffff";
 		context.font = "50px olivier";
 		centerText(context, "SCORE", 0, 300);
-		context.font = "100px olivier";
+		context.font = "100px bebasneue";
 		centerText(context, this.score, 0, 400);
 	}
 
@@ -802,7 +814,7 @@ game.scenes.add("score", new Splat.Scene(canvas, function() {
 			centerText(context, "BEST", 0, 600);
 		}
 
-		context.font = "100px olivier";
+		context.font = "100px bebasneue";
 		centerText(context, best, 0, 700);
 	}
 
