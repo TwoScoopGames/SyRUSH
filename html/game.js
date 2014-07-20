@@ -14,6 +14,7 @@ var manifest = {
 		"next-topping-text": "images/next-topping-text.png",
 		"logo": "images/logo.png",
 		"score-cavity": "images/score-cavity.png",
+		"score-screen-background": "images/score-screen-background.png",
 		"sound-off": "images/sound-off-icon.png",
 		"sound-on": "images/sound-on-icon.png",
 		"title-background": "images/title-background.png",
@@ -143,8 +144,9 @@ var syrupParticles = [];
 var gravity = 0.2;
 var tileSize = 200;
 
-var lastScore = -1;
+var score = -1;
 var best = 0;
+var newBest = false;
 
 function getBest() {
 	Splat.saveData.get("bestScore", function(err, data) {
@@ -219,6 +221,11 @@ Particles.prototype.spray = function(x, y, color, velocity, radius, quantity) {
 		particle.stroke = color;
 	}
 };
+Particles.prototype.reset = function() {
+	for (var i = 0; i < this.particles.length; i++) {
+		this.particles[i].enabled = false;
+	}
+};
 var particles = new Particles(100);
 
 function drawCircle(context, color, radius, strokeColor, strokeSize, x, y) {
@@ -236,30 +243,6 @@ function centerText(context, text, offsetX, offsetY) {
 	var x = offsetX + (canvas.width / 2) - (w / 2) | 0;
 	var y = offsetY | 0;
 	context.fillText(text, x, y);
-}
-
-function drawScoreScreen(context, scene) {
-	var ftb = scene.timers.fadeToBlack.time;
-	scene.camera.drawAbsolute(context, function() {
-		var opacity = Math.min(ftb / 300, 0.7);
-		context.fillStyle = "rgba(0, 0, 0, " + opacity + ")";
-		context.fillRect(0, 0, canvas.width, canvas.height);
-		context.fillStyle = "#ffffff";
-		context.font = "50px olivier";
-		centerText(context, "SCORE", 0, 300);
-		context.font = "100px olivier";
-		centerText(context, scene.score, 0, 400);
-		context.font = "50px olivier";
-		if (scene.newBest) {
-			context.fillStyle = "#be4682";
-			centerText(context, "NEW BEST!", 0, 600);
-		} else {
-			centerText(context, "BEST", 0, 600);
-		}
-
-		context.font = "100px olivier";
-		centerText(context, best, 0, 700);
-	});
 }
 
 function makeSquare(x, y, toppings, emptyPercent, hasEmpty) {
@@ -372,9 +355,10 @@ game.scenes.add("title", new Splat.Scene(canvas, function() {
 game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	this.showLastScore = false;
 	this.startPushed = false;
+	particles.reset();
 	var scene = this;
 	this.timers.score = new Splat.Timer(undefined, 2000, function() {
-		scene.showLastScore = lastScore !== -1 && !scene.showLastScore;
+		scene.showLastScore = score !== -1 && !scene.showLastScore;
 		this.reset();
 		this.start();
 	});
@@ -449,7 +433,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	context.font = "80px olivier";
 	var scoreMessage = "Best: " + best;
 	if (this.showLastScore) {
-		scoreMessage = "Last: " + lastScore;
+		scoreMessage = "Last: " + score;
 	}
 	centerText(context, scoreMessage, 0, 590);
 
@@ -577,10 +561,11 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 
 	this.camera.x = -game.images.get("bg-left").width;
 
-	this.score = 0;
-	this.newBest = false;
+	score = 0;
+	newBest = false;
 	this.message = "";
 	levels = [];
+	level = -1;
 
 	this.nextLevel = function() {
 		level++;
@@ -595,12 +580,6 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 	this.nextLevel();
 
 	var scene = this;
-	this.timers.fadeToBlack = new Splat.Timer(null, 1000, function() {
-		lastScore = scene.score;
-		level = -1;
-		game.scenes.switchTo("game-title");
-	});
-
 	this.timers.banner = new Splat.Timer(function(elapsedMillis) {
 		scene.message.move(elapsedMillis);
 	}, 1000, function() {
@@ -608,7 +587,6 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		scene.message = undefined;
 		scene.messageText = undefined;
 	});
-
 }, function(elapsedMillis) {
 	if (this.camera.x >= (levels[level].width * tileSize) + game.images.get("bg-right").width - canvas.width && this.camera.vx > 0) {
 		this.nextLevel();
@@ -629,10 +607,6 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 
 	particles.move(elapsedMillis);
 
-	if (this.timers.fadeToBlack.running) {
-		return;
-	}
-
 	var movingRight = this.camera.vx > 0;
 
 	var scene = this;
@@ -651,19 +625,17 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		var last = this.squares.splice(currentSquareIndex, 1)[0];
 		if (last.isFinished()) {
 			if (nextSquare !== undefined && last.x !== nextSquare.x) {
-				this.score++;
-				if (scene.score > best) {
-					best = scene.score;
-					scene.newBest = true;
+				score++;
+				if (score > best) {
+					best = score;
+					newBest = true;
 					setBest();
 				}
 			}
 		} else {
 			if (!godmode) {
 				game.sounds.play("gasp");
-				Splat.ads.show(false);
-				this.timers.fadeToBlack.start();
-				this.camera.vx = 0;
+				game.scenes.switchTo("score");
 				return;
 			}
 		}
@@ -707,16 +679,11 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		this.squares[i].draw(context);
 	}
 
-	if (this.timers.fadeToBlack.running) {
-		drawScoreScreen(context, this);
-		return;
-	}
-
 	var scene = this;
 	this.camera.drawAbsolute(context, function() {
 		context.fillStyle = "#ffffff";
 		context.font = "100px olivier";
-		centerText(context, scene.score, 0, 100);
+		centerText(context, score, 0, 100);
 		particles.draw(context);
 		if (scene.message) {
 			scene.message.draw(context, (canvas.width / 2) - (scene.message.width / 2), (canvas.height / 2) - (scene.message.height / 2));
@@ -725,6 +692,36 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 			context.drawImage(scene.messageText, (canvas.width / 2) - (scene.messageText.width / 2), (canvas.height / 2) - (scene.messageText.height / 2));
 		}
 	});
+}));
+
+game.scenes.add("score", new Splat.Scene(canvas, function() {
+	Splat.ads.show(false);
+
+	this.timers.done = new Splat.Timer(undefined, 2000, function() {
+		game.scenes.switchTo("game-title");
+	});
+	this.timers.done.start();
+}, function(elapsedMillis) {
+
+}, function(context) {
+	var bg = game.images.get("score-screen-background");
+	context.drawImage(bg, (canvas.width / 2) - (bg.width / 2), 0);
+
+	context.fillStyle = "#ffffff";
+	context.font = "50px olivier";
+	centerText(context, "SCORE", 0, 300);
+	context.font = "100px olivier";
+	centerText(context, score, 0, 400);
+	context.font = "50px olivier";
+	if (newBest) {
+		context.fillStyle = "#be4682";
+		centerText(context, "NEW BEST!", 0, 600);
+	} else {
+		centerText(context, "BEST", 0, 600);
+	}
+
+	context.font = "100px olivier";
+	centerText(context, best, 0, 700);
 }));
 
 game.scenes.switchTo("loading");
