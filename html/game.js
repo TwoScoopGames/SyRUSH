@@ -432,7 +432,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	context.fillText("Music by Glass Boy", 20, canvas.height - 30);
 
 	var twoScoopLogo = game.images.get("twoscoop-logo-small");
-	context.drawImage(twoScoopLogo, canvas.width - twoScoopLogo.width, canvas.height - twoScoopLogo.height);
+	context.drawImage(twoScoopLogo, canvas.width - twoScoopLogo.width - 17, canvas.height - twoScoopLogo.height);
 
 	var scoreCavity = game.images.get("score-cavity");
 	var cavityX = Math.floor(Math.floor(canvas.width / 80) / 2) * 80 - (scoreCavity.width / 2);
