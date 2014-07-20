@@ -418,7 +418,10 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	}
 }, function(context) {
 	var titleBackground = game.images.get("title-background");
-	for (var x = 0; x < canvas.width; x += titleBackground.width) {
+	for (var x = canvas.width / 2 - titleBackground.width; x > -titleBackground.width; x -= titleBackground.width) {
+		context.drawImage(titleBackground, x, 0);
+	}
+	for (var x = canvas.width / 2; x < canvas.width; x += titleBackground.width) {
 		context.drawImage(titleBackground, x, 0);
 	}
 
@@ -435,7 +438,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	context.drawImage(twoScoopLogo, canvas.width - twoScoopLogo.width - 17, canvas.height - twoScoopLogo.height);
 
 	var scoreCavity = game.images.get("score-cavity");
-	var cavityX = Math.floor(Math.floor(canvas.width / 80) / 2) * 80 - (scoreCavity.width / 2);
+	var cavityX = (canvas.width / 2) - (scoreCavity.width / 2);
 	context.drawImage(scoreCavity, cavityX, 480);
 
 	context.fillStyle = "#553013";
