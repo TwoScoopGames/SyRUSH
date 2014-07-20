@@ -105,6 +105,12 @@ var manifest = {
 			"msPerFrame": 50,
 			"repeatAt": 7
 		},
+		"score-card-anim": {
+			"strip": "images/score-card-anim-f20.png",
+			"frames": 20,
+			"msPerFrame": 15,
+			"repeatAt": 19
+		},
 		"start-button": {
 			"strip": "images/start-button-f5.png",
 			"frames": 5,
@@ -700,28 +706,74 @@ game.scenes.add("score", new Splat.Scene(canvas, function() {
 	this.timers.done = new Splat.Timer(undefined, 2000, function() {
 		game.scenes.switchTo("game-title");
 	});
-	this.timers.done.start();
-}, function(elapsedMillis) {
 
+	this.score = 0;
+	this.showBest = false;
+
+	this.scoreAnim = game.animations.get("score-card-anim").copy();
+	this.bestAnim = game.animations.get("score-card-anim").copy();
+
+	var scene = this;
+	this.timers.increment = new Splat.Timer(undefined, 20, function() {
+		if (scene.score < score + 100) {
+			playRandomSound(popSounds);
+			scene.score++;
+			this.reset();
+			this.start();
+		} else {
+			scene.showBest = true;
+			scene.timers.glimmerBest.start();
+		}
+	});
+
+	this.timers.glimmer = new Splat.Timer(function(elapsedMillis) {
+		scene.scoreAnim.move(elapsedMillis);
+	}, 700, function() {
+		scene.timers.increment.start();
+	});
+	this.timers.glimmer.start();
+
+	this.timers.glimmerBest = new Splat.Timer(function(elapsedMillis) {
+		scene.bestAnim.move(elapsedMillis);
+	}, 700, function() {
+		game.sounds.play("bad-tap");
+		particles.spray(canvas.width / 2, 500 + (scene.bestAnim.height / 2), "#6d511f", 5, 25, 100);
+		scene.timers.done.start();
+	});
+}, function(elapsedMillis) {
+	particles.move(elapsedMillis);
 }, function(context) {
 	var bg = game.images.get("score-screen-background");
 	context.drawImage(bg, (canvas.width / 2) - (bg.width / 2), 0);
 
-	context.fillStyle = "#ffffff";
-	context.font = "50px olivier";
-	centerText(context, "SCORE", 0, 300);
-	context.font = "100px olivier";
-	centerText(context, score, 0, 400);
-	context.font = "50px olivier";
-	if (newBest) {
-		context.fillStyle = "#be4682";
-		centerText(context, "NEW BEST!", 0, 600);
-	} else {
-		centerText(context, "BEST", 0, 600);
+	this.scoreAnim.draw(context, (canvas.width / 2) - (this.scoreAnim.width / 2), 200);
+
+	if (!this.timers.glimmer.running) {
+		context.fillStyle = "#ffffff";
+		context.font = "50px olivier";
+		centerText(context, "SCORE", 0, 300);
+		context.font = "100px olivier";
+		centerText(context, this.score, 0, 400);
 	}
 
-	context.font = "100px olivier";
-	centerText(context, best, 0, 700);
+	if (this.showBest) {
+		this.bestAnim.draw(context, (canvas.width / 2) - (this.bestAnim.width / 2), 500);
+	}
+
+	if (this.timers.done.running) {
+		context.font = "50px olivier";
+		if (newBest) {
+			context.fillStyle = "#be4682";
+			centerText(context, "NEW BEST!", 0, 600);
+		} else {
+			centerText(context, "BEST", 0, 600);
+		}
+
+		context.font = "100px olivier";
+		centerText(context, best, 0, 700);
+	}
+
+	particles.draw(context);
 }));
 
 game.scenes.switchTo("loading");
