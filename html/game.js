@@ -188,6 +188,7 @@ function Particles(max) {
 		});
 	}
 	this.gravity = 0.2;
+	this.maxAge = 1000;
 }
 Particles.prototype.move = function(elapsedMillis) {
 	for (var i = 0; i < this.particles.length; i++) {
@@ -196,6 +197,10 @@ Particles.prototype.move = function(elapsedMillis) {
 			continue;
 		}
 		particle.age += elapsedMillis;
+		if (particle.age > this.maxAge) {
+			particle.enabled = false;
+			continue;
+		}
 		particle.x += particle.vx * elapsedMillis;
 		particle.y += particle.vy * elapsedMillis;
 		particle.vy += this.gravity;
@@ -211,13 +216,9 @@ Particles.prototype.draw = function(context) {
 	}
 };
 Particles.prototype.spray = function(x, y, color, velocity, radius, quantity) {
-	for (var q = 0; q < this.particles.length; q++) {
-		var particle = this.particles[q];
-		if (q >= quantity) {
-			particle.enabled = false;
-			continue;
-		}
+	function setupParticle(particle) {
 		particle.enabled = true;
+		particle.age = 0;
 		particle.x = x;
 		particle.y = y;
 		particle.vx = (Math.random() - 0.5) * velocity;
@@ -225,6 +226,28 @@ Particles.prototype.spray = function(x, y, color, velocity, radius, quantity) {
 		particle.radius = Math.random() * radius;
 		particle.color = color;
 		particle.stroke = color;
+	}
+
+	for (var i = 0; i < this.particles.length; i++) {
+		var particle = this.particles[i];
+		if (particle.enabled) {
+			continue;
+		}
+		if (quantity < 1) {
+			return;
+		}
+		quantity--;
+		setupParticle(particle);
+	}
+
+	// sort oldest first
+	this.particles.sort(function(a, b) {
+		return b.age - a.age;
+	});
+	
+	for (var i = 0; i < quantity; i++) {
+		var particle = this.particles[i];
+		setupParticle(particle);
 	}
 };
 Particles.prototype.reset = function() {
@@ -713,9 +736,13 @@ game.scenes.add("score", new Splat.Scene(canvas, function() {
 	this.scoreAnim = game.animations.get("score-card-anim").copy();
 	this.bestAnim = game.animations.get("score-card-anim").copy();
 
+	this.incrementParticles = new Particles(100);
+	this.incrementParticles.gravity = 1;
+
 	var scene = this;
 	this.timers.increment = new Splat.Timer(undefined, 20, function() {
-		if (scene.score < score + 100) {
+		if (scene.score < score) {
+			scene.incrementParticles.spray(canvas.width / 2, 200 + (scene.scoreAnim.height / 2), "#6d511f", 5, 25, 2);
 			playRandomSound(popSounds);
 			scene.score++;
 			this.reset();
@@ -741,6 +768,7 @@ game.scenes.add("score", new Splat.Scene(canvas, function() {
 		scene.timers.done.start();
 	});
 }, function(elapsedMillis) {
+	this.incrementParticles.move(elapsedMillis);
 	particles.move(elapsedMillis);
 }, function(context) {
 	var bg = game.images.get("score-screen-background");
@@ -773,6 +801,7 @@ game.scenes.add("score", new Splat.Scene(canvas, function() {
 		centerText(context, best, 0, 700);
 	}
 
+	this.incrementParticles.draw(context);
 	particles.draw(context);
 }));
 
