@@ -742,7 +742,7 @@ game.scenes.add("score", new Splat.Scene(canvas, function() {
 	var scene = this;
 	this.timers.increment = new Splat.Timer(undefined, 20, function() {
 		if (scene.score < score) {
-			scene.incrementParticles.spray(canvas.width / 2, 200 + (scene.scoreAnim.height / 2), "#6d511f", 5, 25, 2);
+			scene.incrementParticles.spray(canvas.width / 2, 200 + (scene.scoreAnim.height / 2), "#6d511f", 2, 25, 2);
 			playRandomSound(popSounds);
 			scene.score++;
 			this.reset();
@@ -764,7 +764,12 @@ game.scenes.add("score", new Splat.Scene(canvas, function() {
 		scene.bestAnim.move(elapsedMillis);
 	}, 700, function() {
 		game.sounds.play("bad-tap");
-		particles.spray(canvas.width / 2, 500 + (scene.bestAnim.height / 2), "#6d511f", 5, 25, 100);
+		if (newBest) {
+			game.sounds.play("yay");
+			particles.spray(canvas.width / 2, 500 + (scene.bestAnim.height / 2), "#f3f27a", 3, 25, 100);
+		} else {
+			particles.spray(canvas.width / 2, 500 + (scene.bestAnim.height / 2), "#6d511f", 3, 25, 40);
+		}
 		scene.timers.done.start();
 	});
 }, function(elapsedMillis) {
@@ -791,7 +796,7 @@ game.scenes.add("score", new Splat.Scene(canvas, function() {
 	if (this.timers.done.running) {
 		context.font = "50px olivier";
 		if (newBest) {
-			context.fillStyle = "#be4682";
+			context.fillStyle = "#f3f27a";
 			centerText(context, "NEW BEST!", 0, 600);
 		} else {
 			centerText(context, "BEST", 0, 600);
