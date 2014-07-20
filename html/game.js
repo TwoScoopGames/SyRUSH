@@ -146,12 +146,6 @@ var manifest = {
 
 var game = new Splat.Game(canvas, manifest);
 var godmode = false;
-<<<<<<< Updated upstream
-=======
-var score = 0;
-var best = 0;
-var newBest = false;
->>>>>>> Stashed changes
 var syrupParticles = [];
 var gravity = 0.2;
 var tileSize = 200;
@@ -250,7 +244,7 @@ Particles.prototype.spray = function(x, y, color, velocity, radius, quantity) {
 	this.particles.sort(function(a, b) {
 		return b.age - a.age;
 	});
-
+	
 	for (var i = 0; i < quantity; i++) {
 		var particle = this.particles[i];
 		setupParticle(particle);
@@ -645,7 +639,6 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 	var movingRight = this.camera.vx > 0;
 
 	var scene = this;
-
 	function isOffScreen(entity) {
 		return movingRight ? entity.x + entity.width < scene.camera.x : entity.x > scene.camera.x + scene.camera.width;
 	}
@@ -730,7 +723,6 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 	});
 }));
 
-<<<<<<< Updated upstream
 game.scenes.add("score", new Splat.Scene(canvas, function() {
 	Splat.ads.show(false);
 
@@ -818,6 +810,4 @@ game.scenes.add("score", new Splat.Scene(canvas, function() {
 	particles.draw(context);
 }));
 
-=======
->>>>>>> Stashed changes
 game.scenes.switchTo("loading");
