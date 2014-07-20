@@ -14,6 +14,7 @@ var manifest = {
 		"next-topping-text": "images/next-topping-text.png",
 		"logo": "images/logo.png",
 		"score-cavity": "images/score-cavity.png",
+		"score-tab": "images/score-tab.png",
 		"score-screen-background": "images/score-screen-background.png",
 		"sound-off": "images/sound-off-icon.png",
 		"sound-on": "images/sound-on-icon.png",
@@ -722,9 +723,12 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 
 	var scene = this;
 	this.camera.drawAbsolute(context, function() {
-		context.fillStyle = "#ffffff";
-		context.font = "100px olivier";
-		centerText(context, score, 0, 100);
+		var tab = game.images.get("score-tab");
+		context.drawImage(tab, (canvas.width / 2) - (tab.width / 2), 0);
+
+		context.fillStyle = "#4b4b4b";
+		context.font = "72px bebasneue";
+		centerText(context, score, 0, 65);
 		particles.draw(context);
 		if (scene.message) {
 			scene.message.draw(context, (canvas.width / 2) - (scene.message.width / 2), (canvas.height / 2) - (scene.message.height / 2));
