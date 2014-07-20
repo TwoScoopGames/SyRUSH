@@ -13,6 +13,7 @@ var manifest = {
 		"bg-right": "images/bg-right.png",
 		"next-topping-text": "images/next-topping-text.png",
 		"logo": "images/logo.png",
+		"score-cavity": "images/score-cavity.png",
 		"sound-off": "images/sound-off-icon.png",
 		"sound-on": "images/sound-on-icon.png",
 		"title-background": "images/title-background.png",
@@ -432,6 +433,10 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 
 	var twoScoopLogo = game.images.get("twoscoop-logo-small");
 	context.drawImage(twoScoopLogo, canvas.width - twoScoopLogo.width, canvas.height - twoScoopLogo.height);
+
+	var scoreCavity = game.images.get("score-cavity");
+	var cavityX = Math.floor(Math.floor(canvas.width / 80) / 2) * 80 - (scoreCavity.width / 2);
+	context.drawImage(scoreCavity, cavityX, 480);
 
 	context.fillStyle = "#553013";
 	context.font = "80px syrup";
