@@ -24,7 +24,7 @@ var manifest = {
 	},
 	"sounds": {
 		"button": "sound/menuchange.wav",
-		"music": "sound/Glass_Boy_-_02_-_Bent.mp3",
+		"music": "sound/RoccoW_-_02_-_Weeklybeats_2014_2_-_Daniels_Kruis.mp3",
 		"bad-tap": "sound/196725__paulmorek__sz-squish-12.wav",
 		"gasp": "sound/180005__gentlemanwalrus__shocked-gasp.wav",
 		"yay": "sound/yay.mp3",
@@ -251,7 +251,7 @@ Particles.prototype.spray = function(x, y, color, velocity, radius, quantity) {
 	this.particles.sort(function(a, b) {
 		return b.age - a.age;
 	});
-	
+
 	for (var i = 0; i < quantity; i++) {
 		var particle = this.particles[i];
 		setupParticle(particle);
@@ -404,7 +404,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	game.mouse.onmouseup = function(x, y) {
 		if (x < 344 && y > 1039) {
 			playRandomSound(popSounds);
-			Splat.openUrl("http://boyofglass.com/");
+			Splat.openUrl("https://soundcloud.com/roccow");
 		}
 		if (x > canvas.width - 220 && y > 1039) {
 			playRandomSound(popSounds);
@@ -456,7 +456,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 
 	context.fillStyle = "#fff";
 	context.font = "40px olivier";
-	context.fillText("Music by Glass Boy", 20, canvas.height - 30);
+	context.fillText("Music by RoccoW", 20, canvas.height - 30);
 
 	var twoScoopLogo = game.images.get("twoscoop-logo-small");
 	context.drawImage(twoScoopLogo, canvas.width - twoScoopLogo.width - 17, canvas.height - twoScoopLogo.height);
@@ -565,7 +565,7 @@ var levels = [];
 function generateLevels() {
 	var l = Math.floor(levels.length / 2);
 	var width = 15 + (4 * l);
-	var speed = 0.25 + (0.01 * l);
+	var speed = 0.2 + (0.01 * l);
 	var empty = 0.3 + (0.03 * l);
 	if (empty > 0.6) {
 		empty = 0.6;
@@ -652,6 +652,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 	var movingRight = this.camera.vx > 0;
 
 	var scene = this;
+
 	function isOffScreen(entity) {
 		return movingRight ? entity.x + entity.width < scene.camera.x : entity.x > scene.camera.x + scene.camera.width;
 	}
