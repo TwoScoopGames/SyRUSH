@@ -24,10 +24,11 @@ var manifest = {
 	},
 	"sounds": {
 		"button": "sound/menuchange.wav",
-		"music": "sound/RoccoW_-_02_-_Weeklybeats_2014_2_-_Daniels_Kruis.mp3",
+		"music": "sound/RoccoW_-_02_-_Weeklybeats_2014_2_-_Daniels_Kruis2.mp3",
 		"bad-tap": "sound/196725__paulmorek__sz-squish-12.wav",
 		"gasp": "sound/180005__gentlemanwalrus__shocked-gasp.wav",
 		"yay": "sound/yay.mp3",
+		"next-topping": "sound/next-topping.mp3",
 		"pop1": "sound/pop1.wav",
 		"pop2": "sound/pop2.wav",
 		"pop3": "sound/pop3.wav",
@@ -635,6 +636,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 	});
 }, function(elapsedMillis) {
 	if (this.camera.x >= (levels[level].width * tileSize) + game.images.get("bg-right").width - canvas.width && this.camera.vx > 0) {
+		game.sounds.play("next-topping");
 		this.nextLevel();
 		this.message = game.animations.get(levels[level].toppings[1].nextAnim);
 		this.messageText = game.images.get("next-topping-text");
