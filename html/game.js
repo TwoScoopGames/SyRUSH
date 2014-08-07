@@ -334,9 +334,13 @@ Square.prototype.bad = function() {
 	particles.spray(game.mouse.x, game.mouse.y, topping.particleColor, 5, 25, 100);
 };
 
+var pixelsHigh = Math.ceil(canvas.height / tileSize) * tileSize;
+var pixelDiff = pixelsHigh - canvas.height;
+var startingY = -Math.floor(pixelDiff / 2);
+
 function makeSquareColumn(x, toppings, emptyPercent, hasEmpty) {
 	var squares = [];
-	for (var y = 0; y < canvas.height; y += tileSize) {
+	for (var y = startingY; y < canvas.height; y += tileSize) {
 		squares.unshift(makeSquare(x, y, toppings, emptyPercent, hasEmpty));
 	}
 	return squares;
