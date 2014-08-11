@@ -120,7 +120,13 @@ var manifest = {
 			"repeatAt": 10
 		},
 		"start-button": {
-			"strip": "images/start-button-f5.png",
+			"strip": "images/button-singleplayer.png",
+			"frames": 5,
+			"msPerFrame": 25,
+			"repeatAt": 4
+		},
+		"start-2p-button": {
+			"strip": "images/button-twoplayer.png",
 			"frames": 5,
 			"msPerFrame": 25,
 			"repeatAt": 4
@@ -408,7 +414,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	});
 	this.timers.score.start();
 	this.startButton = game.animations.get("start-button").copy();
-	this.start2pButton = game.animations.get("start-button").copy();
+	this.start2pButton = game.animations.get("start-2p-button").copy();
 
 	game.mouse.onmouseup = function(x, y) {
 		if (x < 344 && y > 1039) {
