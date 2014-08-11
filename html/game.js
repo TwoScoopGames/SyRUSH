@@ -698,6 +698,13 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 				}
 			}
 		} else {
+			if (mode == "2p") {
+				if (last.y < canvas.height / 2) {
+					console.log("top lost");
+				} else {
+					console.log("bottom lost");
+				}
+			}
 			if (!godmode) {
 				game.sounds.play("gasp");
 				game.scenes.switchTo("score");
