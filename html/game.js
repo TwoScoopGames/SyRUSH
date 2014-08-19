@@ -753,12 +753,12 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 			return;
 		}
 	}
-	if (scene.timers.twoPlayerDead.running) {
-		return;
-	}
 	for (var i = 0; i < this.squares.length; i++) {
 		var square = this.squares[i];
 		square.move(elapsedMillis);
+		if (scene.timers.twoPlayerDead.running) {
+			continue;
+		}
 		for (var t = 0; t < game.mouse.touches.length; t++) {
 			var touch = game.mouse.touches[t];
 			if (touch.consumed) {
