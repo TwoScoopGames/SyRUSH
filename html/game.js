@@ -89,6 +89,11 @@ var manifest = {
 			"msPerFrame": 75,
 			"repeatAt": 4
 		},
+		"multiplayer-divider": {
+			"strip": "images/multiplayer-divider.png",
+			"frames": 4,
+			"msPerFrame": 100
+		},
 		"multiplayer-lost": {
 			"strip": "images/multiplayer-lost.png",
 			"frames": 10,
@@ -697,6 +702,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		}
 	}
 
+	game.animations.get("multiplayer-divider").move(elapsedMillis);
 	particles.move(elapsedMillis);
 
 	var movingRight = this.camera.vx > 0;
@@ -733,11 +739,9 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 					if (last.y < canvas.height / 2) {
 						this.top = game.animations.get("multiplayer-lost").copy();
 						this.bottom = game.animations.get("multiplayer-won").copy();
-						console.log("top lost");
 					} else {
 						this.top = game.animations.get("multiplayer-won").copy();
 						this.bottom = game.animations.get("multiplayer-lost").copy();
-						console.log("bottom lost");
 					}
 					game.sounds.play("yay");
 				}
@@ -799,7 +803,13 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		context.fillStyle = "#4b4b4b";
 		context.font = "72px bebasneue";
 		centerText(context, score, 0, 65);
+
+		if (mode == "2p") {
+			var divider = game.animations.get("multiplayer-divider");
+			divider.draw(context, 0, (canvas.height / 2) - (divider.height / 2));
+		}
 		particles.draw(context);
+
 		if (scene.message) {
 			scene.message.draw(context, (canvas.width / 2) - (scene.message.width / 2), (canvas.height / 2) - (scene.message.height / 2));
 		}
