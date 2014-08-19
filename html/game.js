@@ -797,12 +797,14 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 
 	var scene = this;
 	this.camera.drawAbsolute(context, function() {
-		var tab = game.images.get("score-tab");
-		context.drawImage(tab, (canvas.width / 2) - (tab.width / 2), 0);
+		if (mode == "1p") {
+			var tab = game.images.get("score-tab");
+			context.drawImage(tab, (canvas.width / 2) - (tab.width / 2), 0);
 
-		context.fillStyle = "#4b4b4b";
-		context.font = "72px bebasneue";
-		centerText(context, score, 0, 65);
+			context.fillStyle = "#4b4b4b";
+			context.font = "72px bebasneue";
+			centerText(context, score, 0, 65);
+		}
 
 		if (mode == "2p") {
 			var divider = game.animations.get("multiplayer-divider");
