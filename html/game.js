@@ -89,6 +89,16 @@ var manifest = {
 			"msPerFrame": 75,
 			"repeatAt": 4
 		},
+		"multiplayer-lost": {
+			"strip": "images/multiplayer-lost.png",
+			"frames": 10,
+			"msPerFrame": 100
+		},
+		"multiplayer-won": {
+			"strip": "images/multiplayer-won.png",
+			"frames": 10,
+			"msPerFrame": 100
+		},
 		"next-topping-cream": {
 			"strip": "images/next-topping-cream.png",
 			"frames": 6,
@@ -656,23 +666,35 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		scene.message = undefined;
 		scene.messageText = undefined;
 	});
+	this.timers.twoPlayerDead = new Splat.Timer(function(elapsedMillis) {
+		scene.top.move(elapsedMillis);
+		scene.bottom.move(elapsedMillis);
+	}, 5000, function() {
+		game.scenes.switchTo("game-title");
+	});
 }, function(elapsedMillis) {
 	if (this.camera.x >= (levels[level].width * tileSize) + game.images.get("bg-right").width - canvas.width && this.camera.vx > 0) {
-		game.sounds.play("next-topping");
 		this.nextLevel();
-		this.message = game.animations.get(levels[level].toppings[1].nextAnim);
-		this.messageText = game.images.get("next-topping-text");
-		this.timers.banner.reset();
-		this.timers.banner.start();
+
+		if (!this.timers.twoPlayerDead.running) {
+			game.sounds.play("next-topping");
+			this.message = game.animations.get(levels[level].toppings[1].nextAnim);
+			this.messageText = game.images.get("next-topping-text");
+			this.timers.banner.reset();
+			this.timers.banner.start();
+		}
 	}
 	if (this.camera.x < -game.images.get("bg-left").width && this.camera.vx < 0) {
 		this.camera.x = -game.images.get("bg-left").width;
 		this.camera.vx = 0;
-		game.sounds.play("yay");
 		this.nextLevel();
-		this.message = game.animations.get("next-waffle-anim");
-		this.timers.banner.reset();
-		this.timers.banner.start();
+
+		if (!this.timers.twoPlayerDead.running) {
+			game.sounds.play("yay");
+			this.message = game.animations.get("next-waffle-anim");
+			this.timers.banner.reset();
+			this.timers.banner.start();
+		}
 	}
 
 	particles.move(elapsedMillis);
@@ -700,23 +722,35 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 				if (score > best) {
 					best = score;
 					newBest = true;
-					setBest();
+					if (most == "1p") {
+						setBest();
+					}
 				}
 			}
 		} else {
 			if (mode == "2p") {
-				if (last.y < canvas.height / 2) {
-					console.log("top lost");
-				} else {
-					console.log("bottom lost");
+				if (!scene.timers.twoPlayerDead.running) {
+					if (last.y < canvas.height / 2) {
+						this.top = game.animations.get("multiplayer-lost").copy();
+						this.bottom = game.animations.get("multiplayer-won").copy();
+						console.log("top lost");
+					} else {
+						this.top = game.animations.get("multiplayer-won").copy();
+						this.bottom = game.animations.get("multiplayer-lost").copy();
+						console.log("bottom lost");
+					}
+					game.sounds.play("yay");
 				}
-			}
-			if (!godmode) {
+				scene.timers.twoPlayerDead.start();
+			} else if (!godmode) {
 				game.sounds.play("gasp");
 				game.scenes.switchTo("score");
-				return;
 			}
+			return;
 		}
+	}
+	if (scene.timers.twoPlayerDead.running) {
+		return;
 	}
 	for (var i = 0; i < this.squares.length; i++) {
 		var square = this.squares[i];
@@ -771,6 +805,10 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		}
 		if (scene.messageText) {
 			context.drawImage(scene.messageText, (canvas.width / 2) - (scene.messageText.width / 2), (canvas.height / 2) - (scene.messageText.height / 2));
+		}
+		if (scene.timers.twoPlayerDead.running) {
+			scene.top.draw(context, (canvas.width / 2) - (scene.top.width / 2), (canvas.height / 4) - (scene.top.height / 2));
+			scene.bottom.draw(context, (canvas.width / 2) - (scene.bottom.width / 2), (canvas.height * 3 / 4) - (scene.bottom.height / 2));
 		}
 	});
 }));
