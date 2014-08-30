@@ -90,19 +90,32 @@ var manifest = {
 			"repeatAt": 4
 		},
 		"multiplayer-divider": {
-			"strip": "images/multiplayer-divider.png",
-			"frames": 4,
-			"msPerFrame": 100
+			"strip": "images/multiplayer-divider-f14.png",
+			"frames": 14,
+			"msPerFrame": 100,
+			"rotate": "cw"
 		},
 		"multiplayer-lost": {
 			"strip": "images/multiplayer-lost.png",
 			"frames": 10,
 			"msPerFrame": 100
 		},
+		"multiplayer-lost-180": {
+			"strip": "images/multiplayer-lost.png",
+			"frames": 10,
+			"msPerFrame": 100,
+			"rotate": "180"
+		},
 		"multiplayer-won": {
 			"strip": "images/multiplayer-won.png",
 			"frames": 10,
 			"msPerFrame": 100
+		},
+		"multiplayer-won-180": {
+			"strip": "images/multiplayer-won.png",
+			"frames": 10,
+			"msPerFrame": 100,
+			"rotate": "180"
 		},
 		"next-topping-cream": {
 			"strip": "images/next-topping-cream.png",
@@ -737,10 +750,10 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 			if (mode == "2p") {
 				if (!scene.timers.twoPlayerDead.running) {
 					if (last.y < canvas.height / 2) {
-						this.top = game.animations.get("multiplayer-lost").copy();
+						this.top = game.animations.get("multiplayer-lost-180").copy();
 						this.bottom = game.animations.get("multiplayer-won").copy();
 					} else {
-						this.top = game.animations.get("multiplayer-won").copy();
+						this.top = game.animations.get("multiplayer-won-180").copy();
 						this.bottom = game.animations.get("multiplayer-lost").copy();
 					}
 					game.sounds.play("yay");
