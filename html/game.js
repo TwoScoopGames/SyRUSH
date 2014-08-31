@@ -741,7 +741,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 				if (score > best) {
 					best = score;
 					newBest = true;
-					if (most == "1p") {
+					if (mode == "1p") {
 						setBest();
 					}
 				}
