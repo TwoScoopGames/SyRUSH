@@ -212,9 +212,7 @@ function setBest() {
 	Splat.saveData.set({
 		"bestScore": best
 	}, function(err) {});
-	if (window.ejecta) {
-		gameCenter.reportScore("single_player", best);
-	}
+	Splat.leaderboards.reportScore("single_player", best);
 }
 
 function Particles(max) {
@@ -431,19 +429,6 @@ game.scenes.add("title", new Splat.Scene(canvas, function() {
 }));
 
 var mode = "1p";
-var gameCenter;
-if (window.ejecta) {
-	gameCenter = new Ejecta.GameCenter();
-	gameCenter.softAuthenticate(function(error) {
-		if (error) {
-			console.log(error);
-		} else {
-			console.log("success");
-		}
-	});
-
-}
-
 
 game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	this.showLastScore = false;
@@ -481,11 +466,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	}
 
 	if (game.mouse.consumePressed(0, 0, Splat.ads.height, 100, 100)) {
-		if (gameCenter.authed) {
-			gameCenter.showLeaderboard("single_player");
-		} else {
-			gameCenter.authenticate();
-		}
+		Splat.leaderboards.showLeaderboard("single_player");
 	}
 
 	particles.move(elapsedMillis);
