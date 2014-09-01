@@ -485,12 +485,12 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	this.timers.score.start();
 
 	this.buttons = [];
-	var buttonTop = 480;
-	var buttonHSpacing = 140;
+	var buttonTop = 520;
+	var buttonHSpacing = 175;
 
-	var buttonCol1 = (canvas.width / 2) - (game.animations.get("button-singleplayer").width / 2);
+	var buttonCol1 = (canvas.width / 2) - 243;
 	var buttonCol2 = (canvas.width / 2) - (game.animations.get("button-restore").width / 2);
-	var buttonCol3 = (canvas.width / 2) + (game.animations.get("button-singleplayer").width / 2) - game.animations.get("button-restore").width;
+	var buttonCol3 = (canvas.width / 2) + 243 - game.animations.get("button-restore").width;
 
 	var anim;
 
@@ -547,7 +547,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	}));
 
 	anim = game.animations.get(paid ? "button-twoplayer" : "button-twoplayer-disabled").copy();
-	this.buttons.push(new Splat.Button(game.mouse, buttonCol1, buttonTop + 2 * buttonHSpacing, { pressDown: anim }, function(state) {
+	this.buttons.push(new Splat.Button(game.mouse, buttonCol3, buttonTop + buttonHSpacing, { pressDown: anim }, function(state) {
 		if (!paid) {
 			if (state === "pressed") {
 				game.sounds.play("gasp");
@@ -568,13 +568,13 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 
 	if (!paid) {
 		anim = game.animations.get("button-buy").copy();
-		this.buttons.push(new Splat.Button(game.mouse, buttonCol1, buttonTop + 3 * buttonHSpacing, { pressDown: anim }, function(state) {
+		this.buttons.push(new Splat.Button(game.mouse, buttonCol1, buttonTop + 2 * buttonHSpacing - 13, { pressDown: anim }, function(state) {
 			if (this.state === "pressed") {
 			}
 		}));
 
 		anim = game.animations.get("button-restore").copy();
-		this.buttons.push(new Splat.Button(game.mouse, buttonCol3, buttonTop + 3 * buttonHSpacing, { pressDown: anim }, function(state) {
+		this.buttons.push(new Splat.Button(game.mouse, buttonCol3, buttonTop + 2 * buttonHSpacing, { pressDown: anim }, function(state) {
 			if (this.state === "pressed") {
 			}
 		}));
@@ -642,7 +642,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	}
 
 	var logo = game.images.get("logo");
-	context.drawImage(logo, (canvas.width / 2) - (logo.width / 2), 140);
+	context.drawImage(logo, (canvas.width / 2) - (logo.width / 2), 80);
 
 	particles.draw(context);
 }));
