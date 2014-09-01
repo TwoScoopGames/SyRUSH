@@ -529,6 +529,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 			return;
 		}
 		if (state === "pressed") {
+			Splat.leaderboards.showAchievements();
 		}
 	}));
 
