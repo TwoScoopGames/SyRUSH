@@ -113,6 +113,24 @@ var manifest = {
 			"msPerFrame": 75,
 			"repeatAt": 0
 		},
+		"button-singleplayer": {
+			"strip": "images/button-singleplayer.png",
+			"frames": 1,
+			"msPerFrame": 25,
+			"repeatAt": 4
+		},
+		"button-twoplayer": {
+			"strip": "images/button-twoplayer.png",
+			"frames": 1,
+			"msPerFrame": 25,
+			"repeatAt": 4
+		},
+		"button-twoplayer-disabled": {
+			"strip": "images/button-twoplayer-disabled.png",
+			"frames": 1,
+			"msPerFrame": 25,
+			"repeatAt": 4
+		},
 		"chip-anim": {
 			"strip": "images/chip-anim.png",
 			"frames": 5,
@@ -182,18 +200,6 @@ var manifest = {
 			"frames": 11,
 			"msPerFrame": 30,
 			"repeatAt": 10
-		},
-		"start-button": {
-			"strip": "images/button-singleplayer.png",
-			"frames": 1,
-			"msPerFrame": 25,
-			"repeatAt": 4
-		},
-		"start-2p-button": {
-			"strip": "images/button-twoplayer.png",
-			"frames": 1,
-			"msPerFrame": 25,
-			"repeatAt": 4
 		},
 		"strawberry-anim": {
 			"strip": "images/strawberry-anim.png",
@@ -465,6 +471,7 @@ game.scenes.add("title", new Splat.Scene(canvas, function() {
 }));
 
 var mode = "1p";
+var paid = false;
 
 game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	this.showLastScore = false;
@@ -481,9 +488,9 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	var buttonTop = 480;
 	var buttonHSpacing = 140;
 
-	var buttonCol1 = (canvas.width / 2) - (game.animations.get("start-button").width / 2);
+	var buttonCol1 = (canvas.width / 2) - (game.animations.get("button-singleplayer").width / 2);
 	var buttonCol2 = (canvas.width / 2) - (game.animations.get("button-restore").width / 2);
-	var buttonCol3 = (canvas.width / 2) + (game.animations.get("start-button").width / 2) - game.animations.get("button-restore").width;
+	var buttonCol3 = (canvas.width / 2) + (game.animations.get("button-singleplayer").width / 2) - game.animations.get("button-restore").width;
 
 	var anim;
 
@@ -500,18 +507,32 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	soundToggle.isToggle = true;
 	this.buttons.push(soundToggle);
 
-	this.buttons.push(new Splat.Button(game.mouse, buttonCol2, buttonTop, { pressDown: game.animations.get("button-leaderboard").copy() }, function(state) {
+	anim = game.animations.get(paid ? "button-leaderboard" : "button-leaderboard-disabled").copy();
+	this.buttons.push(new Splat.Button(game.mouse, buttonCol2, buttonTop, { pressDown: anim }, function(state) {
+		if (!paid) {
+			if (state === "pressed") {
+				game.sounds.play("gasp");
+			}
+			return;
+		}
 		if (state === "pressed") {
 			Splat.leaderboards.showLeaderboard("single_player");
 		}
 	}));
 
-	this.buttons.push(new Splat.Button(game.mouse, buttonCol3, buttonTop, { pressDown: game.animations.get("button-achievements").copy() }, function(state) {
+	anim = game.animations.get(paid ? "button-achievements" : "button-achievements-disabled").copy();
+	this.buttons.push(new Splat.Button(game.mouse, buttonCol3, buttonTop, { pressDown: anim }, function(state) {
+		if (!paid) {
+			if (state === "pressed") {
+				game.sounds.play("gasp");
+			}
+			return;
+		}
 		if (state === "pressed") {
 		}
 	}));
 
-	anim = game.animations.get("start-button").copy();
+	anim = game.animations.get("button-singleplayer").copy();
 	this.buttons.push(new Splat.Button(game.mouse, buttonCol1, buttonTop + buttonHSpacing, { pressDown: anim }, function(state) {
 		if (state === "pressDown") {
 			game.sounds.play("bad-tap");
@@ -525,8 +546,14 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		}
 	}));
 
-	anim = game.animations.get("start-2p-button").copy();
+	anim = game.animations.get(paid ? "button-twoplayer" : "button-twoplayer-disabled").copy();
 	this.buttons.push(new Splat.Button(game.mouse, buttonCol1, buttonTop + 2 * buttonHSpacing, { pressDown: anim }, function(state) {
+		if (!paid) {
+			if (state === "pressed") {
+				game.sounds.play("gasp");
+			}
+			return;
+		}
 		if (state === "pressDown") {
 			game.sounds.play("bad-tap");
 			particles.spray(game.mouse.x, game.mouse.y, "#6d511f", 5, 25, 100);
@@ -539,17 +566,19 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		}
 	}));
 
-	anim = game.animations.get("button-buy").copy();
-	this.buttons.push(new Splat.Button(game.mouse, buttonCol1, buttonTop + 3 * buttonHSpacing, { pressDown: anim }, function(state) {
-		if (this.state === "pressed") {
-		}
-	}));
+	if (!paid) {
+		anim = game.animations.get("button-buy").copy();
+		this.buttons.push(new Splat.Button(game.mouse, buttonCol1, buttonTop + 3 * buttonHSpacing, { pressDown: anim }, function(state) {
+			if (this.state === "pressed") {
+			}
+		}));
 
-	anim = game.animations.get("button-restore").copy();
-	this.buttons.push(new Splat.Button(game.mouse, buttonCol3, buttonTop + 3 * buttonHSpacing, { pressDown: anim }, function(state) {
-		if (this.state === "pressed") {
-		}
-	}));
+		anim = game.animations.get("button-restore").copy();
+		this.buttons.push(new Splat.Button(game.mouse, buttonCol3, buttonTop + 3 * buttonHSpacing, { pressDown: anim }, function(state) {
+			if (this.state === "pressed") {
+			}
+		}));
+	}
 
 	game.mouse.onmouseup = function(x, y) {
 		if (x < 344 && y > 1039) {
@@ -567,6 +596,11 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	this.buttons.forEach(function(button) {
 		button.move(elapsedMillis);
 	});
+
+	if (game.keyboard.consumePressed("p")) {
+		paid = !paid;
+		game.scenes.switchTo("game-title");
+	}
 }, function(context) {
 	var titleBackground = game.images.get("title-background");
 	for (var x = canvas.width / 2 - titleBackground.width; x > -titleBackground.width; x -= titleBackground.width) {
