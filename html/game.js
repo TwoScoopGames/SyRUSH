@@ -81,6 +81,18 @@ var manifest = {
 			"msPerFrame": 75,
 			"repeatAt": 4
 		},
+		"button-buy": {
+			"strip": "images/button-buy.png",
+			"frames": 1,
+			"msPerFrame": 75,
+			"repeatAt": 0
+		},
+		"button-restore": {
+			"strip": "images/button-restore.png",
+			"frames": 1,
+			"msPerFrame": 75,
+			"repeatAt": 0
+		},
 		"chip-anim": {
 			"strip": "images/chip-anim.png",
 			"frames": 5,
@@ -153,13 +165,13 @@ var manifest = {
 		},
 		"start-button": {
 			"strip": "images/button-singleplayer.png",
-			"frames": 5,
+			"frames": 1,
 			"msPerFrame": 25,
 			"repeatAt": 4
 		},
 		"start-2p-button": {
 			"strip": "images/button-twoplayer.png",
-			"frames": 5,
+			"frames": 1,
 			"msPerFrame": 25,
 			"repeatAt": 4
 		},
@@ -446,39 +458,16 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	this.timers.score.start();
 
 	this.buttons = [];
-	var buttonTop = 570;
-	var buttonHSpacing = 150;
+	var buttonTop = 480;
+	var buttonHSpacing = 140;
 
-	var anim = game.animations.get("start-button").copy();
-	var buttonX = (canvas.width / 2) - (anim.width / 2);
-	this.buttons.push(new Splat.Button(game.mouse, buttonX, buttonTop + buttonHSpacing, { pressDown: anim }, function(state) {
-		if (state === "pressDown") {
-			game.sounds.play("bad-tap");
-			particles.spray(game.mouse.x, game.mouse.y, "#6d511f", 5, 25, 100);
-			mode = "1p";
-		} else if (state === "pressed") {
-			game.mouse.onmouseup = undefined;
-			game.sounds.play("music", true);
-			Splat.ads.hide();
-			game.scenes.switchTo("main");
-		}
-	}));
+	var buttonCol1 = (canvas.width / 2) - (game.animations.get("start-button").width / 2);
+	var buttonCol2 = (canvas.width / 2) - (game.animations.get("button-restore").width / 2);
+	var buttonCol3 = (canvas.width / 2) + (game.animations.get("start-button").width / 2) - game.animations.get("button-restore").width;
 
-	anim = game.animations.get("start-2p-button").copy();
-	this.buttons.push(new Splat.Button(game.mouse, buttonX, buttonTop + 2 * buttonHSpacing, { pressDown: anim }, function(state) {
-		if (state === "pressDown") {
-			game.sounds.play("bad-tap");
-			particles.spray(game.mouse.x, game.mouse.y, "#6d511f", 5, 25, 100);
-			mode = "2p";
-		} else if (state === "pressed") {
-			game.mouse.onmouseup = undefined;
-			game.sounds.play("music", true);
-			Splat.ads.hide();
-			game.scenes.switchTo("main");
-		}
-	}));
+	var anim;
 
-	var soundToggle = new Splat.Button(game.mouse, buttonX, buttonTop, { normal: game.images.get("sound-on"), pressed: game.images.get("sound-off") }, function(state) {
+	var soundToggle = new Splat.Button(game.mouse, buttonCol1, buttonTop, { normal: game.images.get("sound-on"), pressed: game.images.get("sound-off") }, function(state) {
 		if (state === "pressed") {
 			game.sounds.muted = true;
 			game.sounds.stop("music");
@@ -492,17 +481,55 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	this.buttons.push(soundToggle);
 
 	anim = game.images.get("leaderboard-button");
-	buttonX = (canvas.width / 2) - (anim.width / 2);
-	this.buttons.push(new Splat.Button(game.mouse, buttonX, buttonTop, { normal: anim, pressed: anim }, function(state) {
+	this.buttons.push(new Splat.Button(game.mouse, buttonCol2, buttonTop, { normal: anim, pressed: anim }, function(state) {
 		if (state === "pressed") {
 			Splat.leaderboards.showLeaderboard("single_player");
 		}
 	}));
 
 	anim = game.images.get("achievements-button");
-	buttonX = (canvas.width / 2) + (game.animations.get("start-button").width / 2) - anim.width;
-	this.buttons.push(new Splat.Button(game.mouse, buttonX, buttonTop, { normal: anim, pressed: anim }, function(state) {
+	this.buttons.push(new Splat.Button(game.mouse, buttonCol3, buttonTop, { normal: anim, pressed: anim }, function(state) {
 		if (state === "pressed") {
+		}
+	}));
+
+	anim = game.animations.get("start-button").copy();
+	this.buttons.push(new Splat.Button(game.mouse, buttonCol1, buttonTop + buttonHSpacing, { pressDown: anim }, function(state) {
+		if (state === "pressDown") {
+			game.sounds.play("bad-tap");
+			particles.spray(game.mouse.x, game.mouse.y, "#6d511f", 5, 25, 100);
+			mode = "1p";
+		} else if (state === "pressed") {
+			game.mouse.onmouseup = undefined;
+			game.sounds.play("music", true);
+			Splat.ads.hide();
+			game.scenes.switchTo("main");
+		}
+	}));
+
+	anim = game.animations.get("start-2p-button").copy();
+	this.buttons.push(new Splat.Button(game.mouse, buttonCol1, buttonTop + 2 * buttonHSpacing, { pressDown: anim }, function(state) {
+		if (state === "pressDown") {
+			game.sounds.play("bad-tap");
+			particles.spray(game.mouse.x, game.mouse.y, "#6d511f", 5, 25, 100);
+			mode = "2p";
+		} else if (state === "pressed") {
+			game.mouse.onmouseup = undefined;
+			game.sounds.play("music", true);
+			Splat.ads.hide();
+			game.scenes.switchTo("main");
+		}
+	}));
+
+	anim = game.animations.get("button-buy").copy();
+	this.buttons.push(new Splat.Button(game.mouse, buttonCol1, buttonTop + 3 * buttonHSpacing, { pressDown: anim }, function(state) {
+		if (this.state === "pressed") {
+		}
+	}));
+
+	anim = game.animations.get("button-restore").copy();
+	this.buttons.push(new Splat.Button(game.mouse, buttonCol3, buttonTop + 3 * buttonHSpacing, { pressDown: anim }, function(state) {
+		if (this.state === "pressed") {
 		}
 	}));
 
@@ -531,7 +558,6 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		context.drawImage(titleBackground, x, 0);
 	}
 
-
 	this.buttons.forEach(function(button) {
 		button.draw(context);
 	});
@@ -545,7 +571,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 
 	var scoreCavity = game.images.get("score-cavity");
 	var cavityX = (canvas.width / 2) - (scoreCavity.width / 2);
-	var cavityY = 398;
+	var cavityY = 318;
 	context.drawImage(scoreCavity, cavityX, cavityY);
 
 	context.fillStyle = "#553013";
