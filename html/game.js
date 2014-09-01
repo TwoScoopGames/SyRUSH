@@ -476,6 +476,9 @@ var mode = "1p";
 var paid = false;
 
 game.scenes.add("game-title", new Splat.Scene(canvas, function() {
+	if (paid) {
+		Splat.ads.hide();
+	}
 	this.showLastScore = false;
 	particles.reset();
 	var scene = this;
@@ -544,9 +547,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		} else if (state === "pressed") {
 			game.mouse.onmouseup = undefined;
 			game.sounds.play("music", true);
-			if (!paid) {
-				Splat.ads.hide();
-			}
+			Splat.ads.hide();
 			game.scenes.switchTo("main");
 		}
 	}));
@@ -566,9 +567,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		} else if (state === "pressed") {
 			game.mouse.onmouseup = undefined;
 			game.sounds.play("music", true);
-			if (!paid) {
-				Splat.ads.hide();
-			}
+			Splat.ads.hide();
 			game.scenes.switchTo("main");
 		}
 	}));
