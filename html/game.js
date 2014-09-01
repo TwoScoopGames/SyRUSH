@@ -598,7 +598,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		button.move(elapsedMillis);
 	});
 
-	if (game.keyboard.consumePressed("p")) {
+	if (game.keyboard.consumePressed("p") || game.mouse.consumePressed(0, 0, Splat.ads.height, 100, 100)) {
 		paid = !paid;
 		game.scenes.switchTo("game-title");
 	}
