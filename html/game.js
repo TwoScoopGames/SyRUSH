@@ -9,13 +9,9 @@ if (window.ejecta) {
 
 var manifest = {
 	"images": {
-		"achievements-button": "images/button-achievements.png",
-		"achievements-button-disabled": "images/button-achievements-disabled.png",
 		"bg-left": "images/bg-left.png",
 		"bg-right": "images/bg-right.png",
 		"next-topping-text": "images/next-topping-text.png",
-		"leaderboard-button": "images/button-leaderboard.png",
-		"leaderboard-button-disabled": "images/button-leaderboard-disabled.png",
 		"logo": "images/logo.png",
 		"score-cavity": "images/score-cavity.png",
 		"score-tab": "images/score-tab.png",
@@ -81,8 +77,32 @@ var manifest = {
 			"msPerFrame": 75,
 			"repeatAt": 4
 		},
+		"button-achievements": {
+			"strip": "images/button-achievements.png",
+			"frames": 1,
+			"msPerFrame": 75,
+			"repeatAt": 0
+		},
+		"button-achievements-disabled": {
+			"strip": "images/button-achievements-disabled.png",
+			"frames": 1,
+			"msPerFrame": 75,
+			"repeatAt": 0
+		},
 		"button-buy": {
 			"strip": "images/button-buy.png",
+			"frames": 1,
+			"msPerFrame": 75,
+			"repeatAt": 0
+		},
+		"button-leaderboard": {
+			"strip": "images/button-leaderboard.png",
+			"frames": 1,
+			"msPerFrame": 75,
+			"repeatAt": 0
+		},
+		"button-leaderboard-disabled": {
+			"strip": "images/button-leaderboard-disabled.png",
 			"frames": 1,
 			"msPerFrame": 75,
 			"repeatAt": 0
@@ -480,15 +500,13 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	soundToggle.isToggle = true;
 	this.buttons.push(soundToggle);
 
-	anim = game.images.get("leaderboard-button");
-	this.buttons.push(new Splat.Button(game.mouse, buttonCol2, buttonTop, { normal: anim, pressed: anim }, function(state) {
+	this.buttons.push(new Splat.Button(game.mouse, buttonCol2, buttonTop, { pressDown: game.animations.get("button-leaderboard").copy() }, function(state) {
 		if (state === "pressed") {
 			Splat.leaderboards.showLeaderboard("single_player");
 		}
 	}));
 
-	anim = game.images.get("achievements-button");
-	this.buttons.push(new Splat.Button(game.mouse, buttonCol3, buttonTop, { normal: anim, pressed: anim }, function(state) {
+	this.buttons.push(new Splat.Button(game.mouse, buttonCol3, buttonTop, { pressDown: game.animations.get("button-achievements").copy() }, function(state) {
 		if (state === "pressed") {
 		}
 	}));
