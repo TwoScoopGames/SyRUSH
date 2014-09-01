@@ -736,7 +736,7 @@ function generateLevels() {
 	}
 
 	var levelSequence = l % 5;
-	if (levelSequence === 0) {
+	if (!paid || levelSequence === 0) {
 		levels.push(butterOnly(width, speed, empty));
 		levels.push(butterSyrup(width, -speed, empty));
 	} else if (levelSequence === 1) {
