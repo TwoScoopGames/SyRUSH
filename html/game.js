@@ -453,7 +453,9 @@ function isInside(container, x, y) {
 
 game.scenes.add("title", new Splat.Scene(canvas, function() {
 	this.timers.running = new Splat.Timer(null, 2000, function() {
-		Splat.ads.show(false);
+		if (!paid) {
+			Splat.ads.show(false);
+		}
 		game.scenes.switchTo("game-title");
 	});
 	this.timers.running.start();
@@ -542,7 +544,9 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		} else if (state === "pressed") {
 			game.mouse.onmouseup = undefined;
 			game.sounds.play("music", true);
-			Splat.ads.hide();
+			if (!paid) {
+				Splat.ads.hide();
+			}
 			game.scenes.switchTo("main");
 		}
 	}));
@@ -562,7 +566,9 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		} else if (state === "pressed") {
 			game.mouse.onmouseup = undefined;
 			game.sounds.play("music", true);
-			Splat.ads.hide();
+			if (!paid) {
+				Splat.ads.hide();
+			}
 			game.scenes.switchTo("main");
 		}
 	}));
@@ -942,7 +948,9 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 }));
 
 game.scenes.add("score", new Splat.Scene(canvas, function() {
-	Splat.ads.show(false);
+	if (!paid) {
+		Splat.ads.show(false);
+	}
 
 	this.timers.done = new Splat.Timer(undefined, 2000, function() {
 		game.scenes.switchTo("game-title");
