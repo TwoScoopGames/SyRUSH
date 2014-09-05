@@ -475,6 +475,11 @@ game.scenes.add("title", new Splat.Scene(canvas, function() {
 var mode = "1p";
 var paid = false;
 
+function convertToPaid() {
+	paid = true;
+	game.scenes.switchTo("game-title");
+}
+
 game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	if (paid) {
 		Splat.ads.hide();
@@ -576,12 +581,34 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		anim = game.animations.get("button-buy").copy();
 		this.buttons.push(new Splat.Button(game.mouse, buttonCol1, buttonTop + 2 * buttonHSpacing - 13, { pressDown: anim }, function(state) {
 			if (this.state === "pressed") {
+				Splat.iap.get("fullgame", function(err, product) {
+					if (err) {
+						console.error("Error fetching sku", err);
+						return;
+					}
+					Splat.iap.buy(product, 1, function(err) {
+						if (err) {
+							console.error("Error buying product", err);
+							return;
+						}
+						convertToPaid();
+					});
+				});
 			}
 		}));
 
 		anim = game.animations.get("button-restore").copy();
 		this.buttons.push(new Splat.Button(game.mouse, buttonCol3, buttonTop + 2 * buttonHSpacing, { pressDown: anim }, function(state) {
 			if (this.state === "pressed") {
+				Splat.iap.restore(function(err, skus) {
+					if (err) {
+						console.error("Error restoring purchases", err);
+						return;
+					}
+					if (skus.indexOf("fullgame") !== -1) {
+						convertToPaid();
+					}
+				});
 			}
 		}));
 	}
