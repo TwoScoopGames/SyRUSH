@@ -91,9 +91,17 @@ var manifest = {
 		},
 		"button-buy": {
 			"strip": "images/button-buy.png",
-			"frames": 1,
-			"msPerFrame": 75,
-			"repeatAt": 0
+			"frames": 25,
+			"msPerFrame": 45,
+			"repeatAt": 0,
+			"rotate": "ccw"
+		},
+		"button-buy-down": {
+			"strip": "images/button-buy-down.png",
+			"frames": 10,
+			"msPerFrame": 20,
+			"repeatAt": 9,
+			"rotate": "ccw"
 		},
 		"button-leaderboard": {
 			"strip": "images/button-leaderboard.png",
@@ -578,9 +586,11 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	}));
 
 	if (!paid) {
-		anim = game.animations.get("button-buy").copy();
-		this.buttons.push(new Splat.Button(game.mouse, buttonCol1, buttonTop + 2 * buttonHSpacing - 13, { pressDown: anim }, function(state) {
-			if (this.state === "pressed") {
+		this.buttons.push(new Splat.Button(game.mouse, buttonCol1, buttonTop + 2 * buttonHSpacing - 13, { normal: game.animations.get("button-buy").copy(), pressDown: game.animations.get("button-buy-down") }, function(state) {
+			if (state === "pressDown") {
+				game.sounds.play("bad-tap");
+				particles.spray(game.mouse.x, game.mouse.y, "#6d511f", 5, 25, 100);
+			} else if (this.state === "pressed") {
 				Splat.iap.get("fullgame", function(err, product) {
 					if (err) {
 						console.error("Error fetching sku", err);
