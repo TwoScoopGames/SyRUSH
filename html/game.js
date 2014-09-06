@@ -11,6 +11,7 @@ var manifest = {
 	"images": {
 		"bg-left": "images/bg-left.png",
 		"bg-right": "images/bg-right.png",
+		"buy-screen": "images/buy-screen.png",
 		"next-topping-text": "images/next-topping-text.png",
 		"logo": "images/logo.png",
 		"particle-star": "images/particle-star.png",
@@ -98,6 +99,12 @@ var manifest = {
 			"repeatAt": 0,
 			"rotate": "ccw"
 		},
+		"button-buy-confirm": {
+			"strip": "images/button-buy-confirm.png",
+			"frames": 1,
+			"msPerFrame": 45,
+			"repeatAt": 0
+		},
 		"button-buy-down": {
 			"strip": "images/button-buy-down.png",
 			"frames": 10,
@@ -115,6 +122,12 @@ var manifest = {
 			"strip": "images/button-leaderboard-disabled.png",
 			"frames": 1,
 			"msPerFrame": 75,
+			"repeatAt": 0
+		},
+		"button-not-yet": {
+			"strip": "images/button-not-yet.png",
+			"frames": 1,
+			"msPerFrame": 45,
 			"repeatAt": 0
 		},
 		"button-restore": {
@@ -433,6 +446,8 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	});
 	this.timers.score.start();
 
+	particles.reset();
+
 	this.buttons = [];
 	var buttonTop = 520;
 	var buttonHSpacing = 175;
@@ -519,22 +534,10 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	if (!paid) {
 		this.buttons.push(new Splat.Button(game.mouse, buttonCol1, buttonTop + 2 * buttonHSpacing - 13, { normal: game.animations.get("button-buy").copy(), pressDown: game.animations.get("button-buy-down") }, function(state) {
 			if (state === "pressDown") {
-				game.sounds.play("bad-tap");
+				game.sounds.play("yay");
 				particles.add(100, game.mouse.x, game.mouse.y, 5, { image: game.images.get("starticle") });
 			} else if (this.state === "pressed") {
-				Splat.iap.get("fullgame", function(err, product) {
-					if (err) {
-						console.error("Error fetching sku", err);
-						return;
-					}
-					Splat.iap.buy(product, 1, function(err) {
-						if (err) {
-							console.error("Error buying product", err);
-							return;
-						}
-						convertToPaid();
-					});
-				});
+				game.scenes.switchTo("buy");
 			}
 		}));
 
@@ -554,7 +557,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		}));
 	}
 
-	game.mouse.onmouseup = function(x, y) {
+	var mouseUpHandler = function(x, y) {
 		if (x < 344 && y > 1039) {
 			playRandomSound(popSounds);
 			Splat.openUrl("https://soundcloud.com/roccow");
@@ -564,6 +567,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 			Splat.openUrl("http://twoscoopgames.com/");
 		}
 	};
+	game.mouse.onmouseup = game.mouse.isPressed(0) ? function() { game.mouse.onmouseup = mouseUpHandler; } : mouseUpHandler;
 }, function(elapsedMillis) {
 	particles.move(elapsedMillis);
 
@@ -920,7 +924,11 @@ game.scenes.add("score", new Splat.Scene(canvas, function() {
 	}
 
 	this.timers.done = new Splat.Timer(undefined, 2000, function() {
-		game.scenes.switchTo("game-title");
+		if (paid) {
+			game.scenes.switchTo("game-title");
+		} else {
+			game.scenes.switchTo("buy");
+		}
 	});
 
 	this.score = 0;
@@ -1008,6 +1016,47 @@ game.scenes.add("score", new Splat.Scene(canvas, function() {
 
 	this.incrementParticles.draw(context);
 	particles.draw(context);
+}));
+
+game.scenes.add("buy", new Splat.Scene(canvas, function() {
+	Splat.ads.hide();
+
+	var anim = game.animations.get("button-buy-confirm").copy();
+	var x = canvas.width / 2 - anim.width / 2;
+	this.buyButton = new Splat.Button(game.mouse, x, 860, { pressDown: anim }, function(state) {
+		if (state === "pressed") {
+			Splat.iap.get("fullgame", function(err, product) {
+				if (err) {
+					console.error("Error fetching sku", err);
+					return;
+				}
+				Splat.iap.buy(product, 1, function(err) {
+					if (err) {
+						console.error("Error buying product", err);
+						return;
+					}
+					convertToPaid();
+				});
+			});
+		}
+	});
+	anim = game.animations.get("button-not-yet").copy();
+	x = canvas.width / 2 - anim.width / 2;
+	this.notYetButton = new Splat.Button(game.mouse, x, 1050, { pressDown: anim }, function(state) {
+		if (state === "pressed") {
+			game.sounds.play("gasp");
+			Splat.ads.show(false);
+			game.scenes.switchTo("game-title");
+		}
+	});
+}, function(elapsedMillis) {
+	this.buyButton.move(elapsedMillis);
+	this.notYetButton.move(elapsedMillis);
+}, function(context) {
+	var bg = game.images.get("buy-screen");
+	context.drawImage(bg, canvas.width / 2 - bg.width / 2, 0);
+	this.buyButton.draw(context);
+	this.notYetButton.draw(context);
 }));
 
 game.scenes.switchTo("loading");
