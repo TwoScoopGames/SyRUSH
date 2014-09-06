@@ -79,7 +79,7 @@ var manifest = {
 		},
 		"button-achievements": {
 			"strip": "images/button-achievements.png",
-			"frames": 1,
+			"frames": 5,
 			"msPerFrame": 75,
 			"repeatAt": 0
 		},
@@ -105,7 +105,7 @@ var manifest = {
 		},
 		"button-leaderboard": {
 			"strip": "images/button-leaderboard.png",
-			"frames": 1,
+			"frames": 5,
 			"msPerFrame": 75,
 			"repeatAt": 0
 		},
@@ -117,19 +117,19 @@ var manifest = {
 		},
 		"button-restore": {
 			"strip": "images/button-restore.png",
-			"frames": 1,
+			"frames": 5,
 			"msPerFrame": 75,
 			"repeatAt": 0
 		},
 		"button-singleplayer": {
 			"strip": "images/button-singleplayer.png",
-			"frames": 1,
+			"frames": 5,
 			"msPerFrame": 25,
 			"repeatAt": 4
 		},
 		"button-twoplayer": {
 			"strip": "images/button-twoplayer.png",
-			"frames": 1,
+			"frames": 5,
 			"msPerFrame": 25,
 			"repeatAt": 4
 		},
