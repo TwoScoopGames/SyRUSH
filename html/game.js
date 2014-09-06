@@ -265,90 +265,14 @@ function setBest() {
 	Splat.leaderboards.reportScore("single_player", best);
 }
 
-function Particles(max) {
-	this.particles = [];
-	for (var i = 0; i < max; i++) {
-		this.particles.push({
-			x: 0,
-			y: 0,
-			vx: 0,
-			vy: 0,
-			radius: 0,
-			color: "#ffffff",
-			stroke: "#ffffff",
-			enabled: false,
-			age: 0
-		});
-	}
-	this.gravity = 0.2;
-	this.maxAge = 1000;
-}
-Particles.prototype.move = function(elapsedMillis) {
-	for (var i = 0; i < this.particles.length; i++) {
-		var particle = this.particles[i];
-		if (!particle.enabled) {
-			continue;
-		}
-		particle.age += elapsedMillis;
-		if (particle.age > this.maxAge) {
-			particle.enabled = false;
-			continue;
-		}
-		particle.x += particle.vx * elapsedMillis;
-		particle.y += particle.vy * elapsedMillis;
-		particle.vy += this.gravity;
-	}
-};
-Particles.prototype.draw = function(context) {
-	for (var i = 0; i < this.particles.length; i++) {
-		var particle = this.particles[i];
-		if (!particle.enabled) {
-			continue;
-		}
-		drawCircle(context, particle.color, particle.radius, particle.stroke, 0, particle.x, particle.y);
-	}
-};
-Particles.prototype.spray = function(x, y, color, velocity, radius, quantity) {
-	function setupParticle(particle) {
-		particle.enabled = true;
-		particle.age = 0;
-		particle.x = x;
-		particle.y = y;
-		particle.vx = (Math.random() - 0.5) * velocity;
-		particle.vy = (Math.random() - 0.5) * velocity;
-		particle.radius = Math.random() * radius;
-		particle.color = color;
-		particle.stroke = color;
-	}
-
-	for (var i = 0; i < this.particles.length; i++) {
-		var particle = this.particles[i];
-		if (particle.enabled) {
-			continue;
-		}
-		if (quantity < 1) {
-			return;
-		}
-		quantity--;
-		setupParticle(particle);
-	}
-
-	// sort oldest first
-	this.particles.sort(function(a, b) {
-		return b.age - a.age;
-	});
-
-	for (var i = 0; i < quantity; i++) {
-		var particle = this.particles[i];
-		setupParticle(particle);
-	}
-};
-Particles.prototype.reset = function() {
-	for (var i = 0; i < this.particles.length; i++) {
-		this.particles[i].enabled = false;
-	}
-};
-var particles = new Particles(100);
+var particles = new Splat.Particles(100, function(particle, options) {
+	options = options || { radius: 25, color: "#ffffff" };
+	particle.radius = Math.random() * options.radius;
+	particle.color = options.color;
+	particle.stroke = options.color;
+}, function(context, particle) {
+	drawCircle(context, particle.color, particle.radius, particle.stroke, 0, particle.x, particle.y);
+});
 
 function drawCircle(context, color, radius, strokeColor, strokeSize, x, y) {
 	context.beginPath();
@@ -412,12 +336,12 @@ Square.prototype.next = function() {
 	this.nextTopping++;
 
 	playRandomSound(topping.sounds);
-	particles.spray(game.mouse.x, game.mouse.y, topping.particleColor, 5, 25, 8);
+	particles.add(8, game.mouse.x, game.mouse.y, 5, { "radius": 25, "color": topping.particleColor });
 };
 Square.prototype.bad = function() {
 	game.sounds.play("bad-tap");
 	var topping = this.toppings[this.nextTopping - 1];
-	particles.spray(game.mouse.x, game.mouse.y, topping.particleColor, 5, 25, 100);
+	particles.add(100, game.mouse.x, game.mouse.y, 5, { "radius": 25, "color": topping.particleColor });
 };
 
 var pixelsHigh = Math.ceil(canvas.height / tileSize) * tileSize;
@@ -493,7 +417,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		Splat.ads.hide();
 	}
 	this.showLastScore = false;
-	particles.reset();
+
 	var scene = this;
 	this.timers.score = new Splat.Timer(undefined, 2000, function() {
 		scene.showLastScore = score !== -1 && !scene.showLastScore;
@@ -555,7 +479,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	this.buttons.push(new Splat.Button(game.mouse, buttonCol1, buttonTop + buttonHSpacing, { pressDown: anim }, function(state) {
 		if (state === "pressDown") {
 			game.sounds.play("bad-tap");
-			particles.spray(game.mouse.x, game.mouse.y, "#6d511f", 5, 25, 100);
+			particles.add(100, game.mouse.x, game.mouse.y, 5, { "radius": 25, "color": "#6d511f" });
 			mode = "1p";
 		} else if (state === "pressed") {
 			game.mouse.onmouseup = undefined;
@@ -575,7 +499,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		}
 		if (state === "pressDown") {
 			game.sounds.play("bad-tap");
-			particles.spray(game.mouse.x, game.mouse.y, "#6d511f", 5, 25, 100);
+			particles.add(100, game.mouse.x, game.mouse.y, 5, { "radius": 25, "color": "#6d511f" });
 			mode = "2p";
 		} else if (state === "pressed") {
 			game.mouse.onmouseup = undefined;
@@ -589,7 +513,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		this.buttons.push(new Splat.Button(game.mouse, buttonCol1, buttonTop + 2 * buttonHSpacing - 13, { normal: game.animations.get("button-buy").copy(), pressDown: game.animations.get("button-buy-down") }, function(state) {
 			if (state === "pressDown") {
 				game.sounds.play("bad-tap");
-				particles.spray(game.mouse.x, game.mouse.y, "#6d511f", 5, 25, 100);
+				particles.add(100, game.mouse.x, game.mouse.y, 5, { "radius": 25, "color": "green" });
 			} else if (this.state === "pressed") {
 				Splat.iap.get("fullgame", function(err, product) {
 					if (err) {
@@ -998,13 +922,20 @@ game.scenes.add("score", new Splat.Scene(canvas, function() {
 	this.scoreAnim = game.animations.get("score-card-anim").copy();
 	this.bestAnim = game.animations.get("score-card-anim").copy();
 
-	this.incrementParticles = new Particles(100);
+	this.incrementParticles = new Splat.Particles(100, function(particle, options) {
+		options = options || { radius: 25, color: "#ffffff" };
+		particle.radius = Math.random() * options.radius;
+		particle.color = options.color;
+		particle.stroke = options.color;
+	}, function(context, particle) {
+		drawCircle(context, particle.color, particle.radius, particle.stroke, 0, particle.x, particle.y);
+	});
 	this.incrementParticles.gravity = 1;
 
 	var scene = this;
 	this.timers.increment = new Splat.Timer(undefined, 20, function() {
 		if (scene.score < score) {
-			scene.incrementParticles.spray(canvas.width / 2, 200 + (scene.scoreAnim.height / 2), "#6d511f", 2, 25, 2);
+			scene.incrementParticles.add(2, canvas.width / 2, 200 + (scene.scoreAnim.height / 2), 5, { "radius": 25, "color": "#6d511f" });
 			playRandomSound(popSounds);
 			scene.score++;
 			this.reset();
@@ -1028,9 +959,9 @@ game.scenes.add("score", new Splat.Scene(canvas, function() {
 		game.sounds.play("bad-tap");
 		if (newBest) {
 			game.sounds.play("yay");
-			particles.spray(canvas.width / 2, 500 + (scene.bestAnim.height / 2), "#f3f27a", 3, 25, 100);
+			particles.add(100, canvas.width / 2, 500 + (scene.bestAnim.height / 2), 3, { "radius": 25, "color": "#f3f27a" });
 		} else {
-			particles.spray(canvas.width / 2, 500 + (scene.bestAnim.height / 2), "#6d511f", 3, 25, 40);
+			particles.add(40, canvas.width / 2, 500 + (scene.bestAnim.height / 2), 3, { "radius": 25, "color": "#6d511f" });
 		}
 		scene.timers.done.start();
 	});
