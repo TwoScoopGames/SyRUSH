@@ -1025,6 +1025,7 @@ game.scenes.add("buy", new Splat.Scene(canvas, function() {
 	var x = canvas.width / 2 - anim.width / 2;
 	this.buyButton = new Splat.Button(game.mouse, x, 860, { pressDown: anim }, function(state) {
 		if (state === "pressed") {
+			game.sounds.play("yay");
 			Splat.iap.get("fullgame", function(err, product) {
 				if (err) {
 					console.error("Error fetching sku", err);
