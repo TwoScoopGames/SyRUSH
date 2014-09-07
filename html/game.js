@@ -819,6 +819,10 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		}
 	}
 
+	if (game.keyboard.consumePressed("g")) {
+		godmode = !godmode;
+		console.log("godmode", godmode);
+	}
 	game.animations.get("multiplayer-divider").move(elapsedMillis);
 	particles.move(elapsedMillis);
 
