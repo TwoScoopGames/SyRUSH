@@ -590,10 +590,10 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		button.move(elapsedMillis);
 	});
 
-	if (game.keyboard.consumePressed("p") || game.mouse.consumePressed(0, 0, Splat.ads.height, 100, 100)) {
-		paid = !paid;
-		game.scenes.switchTo("game-title");
-	}
+	// if (game.keyboard.consumePressed("p") || game.mouse.consumePressed(0, 0, Splat.ads.height, 100, 100)) {
+	// 	paid = !paid;
+	// 	game.scenes.switchTo("game-title");
+	// }
 }, function(context) {
 	var titleBackground = game.images.get("title-background");
 	for (var x = canvas.width / 2 - titleBackground.width; x > -titleBackground.width; x -= titleBackground.width) {
