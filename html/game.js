@@ -108,7 +108,7 @@ var manifest = {
 		"button-buy-down": {
 			"strip": "images/button-buy-down.png",
 			"frames": 10,
-			"msPerFrame": 20,
+			"msPerFrame": 30,
 			"repeatAt": 9,
 			"rotate": "ccw"
 		},
