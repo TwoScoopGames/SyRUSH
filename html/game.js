@@ -818,13 +818,6 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		if (last.isFinished()) {
 			if (nextSquare !== undefined && last.x !== nextSquare.x) {
 				score++;
-				if (score > best) {
-					best = score;
-					newBest = true;
-					if (mode == "1p") {
-						setBest();
-					}
-				}
 			}
 		} else {
 			if (mode == "2p") {
@@ -840,6 +833,13 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 				}
 				scene.timers.twoPlayerDead.start();
 			} else if (!godmode) {
+				if (score > best) {
+					best = score;
+					newBest = true;
+					if (mode == "1p") {
+						setBest();
+					}
+				}
 				game.sounds.play("gasp");
 				game.scenes.switchTo("score");
 			}
