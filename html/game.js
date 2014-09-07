@@ -861,6 +861,12 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 				}
 				scene.timers.twoPlayerDead.start();
 			} else if (!godmode) {
+				if (score > 633) {
+					reportAchievement("633");
+				}
+				if (score >= 811) {
+					reportAchievement("811");
+				}
 				if (score > best) {
 					best = score;
 					newBest = true;
