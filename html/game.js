@@ -702,7 +702,7 @@ var butterSyrup = makeLevel.bind(undefined, [toppings.butter, toppings.syrup], "
 var blueberryOnly = makeLevel.bind(undefined, [toppings.blueberry], undefined);
 var blueberryCream = makeLevel.bind(undefined, [toppings.blueberry, toppings.cream], "blueberry_and_cream");
 var strawberryOnly = makeLevel.bind(undefined, [toppings.strawberry], undefined);
-var strawberryCream = makeLevel.bind(undefined, [toppings.strawberry, toppings.cream], "blueberry_and_cream");
+var strawberryCream = makeLevel.bind(undefined, [toppings.strawberry, toppings.cream], "strawberry_and_cream");
 var chipOnly = makeLevel.bind(undefined, [toppings.chip], undefined);
 var chipCream = makeLevel.bind(undefined, [toppings.chip, toppings.cream], "chip_and_cream");
 
