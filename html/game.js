@@ -632,12 +632,13 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	particles.draw(context);
 }));
 
-function makeLevel(toppings, width, speed, emptyPercent) {
+function makeLevel(toppings, achievement, width, speed, emptyPercent) {
 	return {
 		toppings: toppings,
 		width: width,
 		speed: speed,
-		emptyPercent: emptyPercent
+		emptyPercent: emptyPercent,
+		achievement: achievement
 	};
 }
 
@@ -687,15 +688,15 @@ var toppings = {
 };
 
 
-var butterOnly = makeLevel.bind(undefined, [toppings.butter]);
-var butterSugar = makeLevel.bind(undefined, [toppings.butter, toppings.sugar]);
-var butterSyrup = makeLevel.bind(undefined, [toppings.butter, toppings.syrup]);
-var blueberryOnly = makeLevel.bind(undefined, [toppings.blueberry]);
-var blueberryCream = makeLevel.bind(undefined, [toppings.blueberry, toppings.cream]);
-var strawberryOnly = makeLevel.bind(undefined, [toppings.strawberry]);
-var strawberryCream = makeLevel.bind(undefined, [toppings.strawberry, toppings.cream]);
-var chipOnly = makeLevel.bind(undefined, [toppings.chip]);
-var chipCream = makeLevel.bind(undefined, [toppings.chip, toppings.cream]);
+var butterOnly = makeLevel.bind(undefined, [toppings.butter], undefined);
+var butterSugar = makeLevel.bind(undefined, [toppings.butter, toppings.sugar], "butter_and_sugar");
+var butterSyrup = makeLevel.bind(undefined, [toppings.butter, toppings.syrup], "butter_and_syrup");
+var blueberryOnly = makeLevel.bind(undefined, [toppings.blueberry], undefined);
+var blueberryCream = makeLevel.bind(undefined, [toppings.blueberry, toppings.cream], "blueberry_and_cream");
+var strawberryOnly = makeLevel.bind(undefined, [toppings.strawberry], undefined);
+var strawberryCream = makeLevel.bind(undefined, [toppings.strawberry, toppings.cream], "blueberry_and_cream");
+var chipOnly = makeLevel.bind(undefined, [toppings.chip], undefined);
+var chipCream = makeLevel.bind(undefined, [toppings.chip, toppings.cream], "chip_and_cream");
 
 function randomIntBetween(min, max) {
 	return Math.floor(Math.random() * (max - min + 1) + min);
@@ -750,8 +751,20 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 	this.message = "";
 	levels = [];
 	level = -1;
+	this.badTaps = 0;
 
 	this.nextLevel = function() {
+		if (paid && mode === "1p" && levels[level]) {
+			if (levels[level].achievement) {
+				console.log("achievement unlocked", levels[level].achievement);
+				Splat.leaderboards.reportAchievement(levels[level].achievement, 100);
+			}
+			if (this.badTaps > 5) {
+				console.log("achievement unlocked", "5_bad_taps");
+				Splat.leaderboards.reportAchievement("5_bad_taps", 100);
+			}
+		}
+		this.badTaps = 0;
 		level++;
 		if (level >= levels.length) {
 			generateLevels();
@@ -870,6 +883,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 			}
 			touch.consumed = true;
 			if (square.isFinished()) {
+				this.badTaps++;
 				square.bad();
 				// speed up camera as penalty
 				if (this.camera.vx > 0) {
