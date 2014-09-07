@@ -261,17 +261,32 @@ var score = -1;
 var best = 0;
 var newBest = false;
 
-function getBest() {
-	Splat.saveData.get("bestScore", function(err, data) {
+var mode = "1p";
+var paid = false;
+
+function convertToPaid() {
+	paid = true;
+	game.scenes.switchTo("game-title");
+	Splat.saveData.set({
+		"paid": "true"
+	}, function(err) {});
+}
+
+function getSaveData() {
+	Splat.saveData.get(["bestScore", "paid"], function(err, data) {
 		if (!err) {
 			var b = data["bestScore"];
 			if (b) {
 				best = parseInt(b);
 			}
+			var p = data["paid"];
+			if (p) {
+				paid = p === "true";
+			}
 		}
 	});
 }
-getBest();
+getSaveData();
 
 function setBest() {
 	Splat.saveData.set({
@@ -423,14 +438,6 @@ game.scenes.add("title", new Splat.Scene(canvas, function() {
 
 	anim.draw(context, (canvas.width / 2) - (anim.width / 2), (canvas.height / 2) - (anim.height / 2));
 }));
-
-var mode = "1p";
-var paid = false;
-
-function convertToPaid() {
-	paid = true;
-	game.scenes.switchTo("game-title");
-}
 
 game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	if (paid) {
