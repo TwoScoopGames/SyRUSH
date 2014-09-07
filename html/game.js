@@ -295,6 +295,14 @@ function setBest() {
 	Splat.leaderboards.reportScore("single_player", best);
 }
 
+function reportAchievement(achievement) {
+	if (!paid || mode !== "1p") {
+		return;
+	}
+	console.log("achievement unlocked", achievement);
+	Splat.leaderboards.reportAchievement(achievement, 100);
+}
+
 var particles = new Splat.Particles(100, function(particle, options) {
 	options = options || { radius: 25, color: "#ffffff" };
 	particle.image = options.image;
@@ -754,15 +762,11 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 	this.badTaps = 0;
 
 	this.nextLevel = function() {
-		if (paid && mode === "1p" && levels[level]) {
-			if (levels[level].achievement) {
-				console.log("achievement unlocked", levels[level].achievement);
-				Splat.leaderboards.reportAchievement(levels[level].achievement, 100);
-			}
-			if (this.badTaps > 5) {
-				console.log("achievement unlocked", "5_bad_taps");
-				Splat.leaderboards.reportAchievement("5_bad_taps", 100);
-			}
+		if (level[level] && levels[level].achievement) {
+			reportAchievement(levels[level].achievement);
+		}
+		if (this.badTaps > 5) {
+			reportAchievement("5_bad_taps");
 		}
 		this.badTaps = 0;
 		level++;
@@ -896,8 +900,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 				var movingRightSave = this.camera.vx > 0 &&  square.x < this.camera.x - tileSize / 2;
 				var movingLeftSave = this.camera.vx < 0 && square.x > this.camera.x + canvas.width - tileSize / 2;
 				if (movingRightSave || movingLeftSave) {
-					console.log("achievement unlocked", "good_save");
-					Splat.leaderboards.reportAchievement("good_save", 100);
+					reportAchievement("good_save");
 				}
 			}
 		}
