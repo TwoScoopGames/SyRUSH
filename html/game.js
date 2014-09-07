@@ -893,6 +893,12 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 				}
 			} else {
 				square.next();
+				var movingRightSave = this.camera.vx > 0 &&  square.x < this.camera.x - tileSize / 2;
+				var movingLeftSave = this.camera.vx < 0 && square.x > this.camera.x + canvas.width - tileSize / 2;
+				if (movingRightSave || movingLeftSave) {
+					console.log("achievement unlocked", "good_save");
+					Splat.leaderboards.reportAchievement("good_save", 100);
+				}
 			}
 		}
 	}
