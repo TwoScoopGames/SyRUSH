@@ -762,7 +762,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 	this.badTaps = 0;
 
 	this.nextLevel = function() {
-		if (level[level] && levels[level].achievement) {
+		if (levels[level] && levels[level].achievement) {
 			reportAchievement(levels[level].achievement);
 		}
 		if (this.badTaps > 5) {
