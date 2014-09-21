@@ -475,14 +475,14 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 
 	var soundToggle = new Splat.Button(game.mouse, buttonCol1, buttonTop, { normal: game.images.get("sound-on"), pressed: game.images.get("sound-off") }, function(state) {
 		if (state === "pressed") {
-			game.sounds.muted = true;
-			game.sounds.stop("music");
+			game.sounds.mute();
 		} else if (state === "normal") {
-			game.sounds.muted = true;
+			game.sounds.unmute();
 			playRandomSound(popSounds);
 		}
 	}, function() {
 	});
+	soundToggle.state = game.sounds.muted ? "pressed" : "normal";
 	soundToggle.isToggle = true;
 	this.buttons.push(soundToggle);
 
