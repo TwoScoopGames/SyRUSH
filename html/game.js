@@ -760,6 +760,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 	levels = [];
 	level = -1;
 	this.badTaps = 0;
+	this.paused = false;
 
 	this.nextLevel = function() {
 		if (levels[level] && levels[level].achievement) {
@@ -794,7 +795,28 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 	}, 5000, function() {
 		game.scenes.switchTo("game-title");
 	});
+
+	this.visibilitychange = function(state) {
+		if (state === "hidden") {
+			this.paused = true;
+			this.pausedCamera = this.camera.vx;
+			this.camera.vx = 0;
+			this.wasMuted = game.sounds.muted;
+			game.sounds.mute();
+		}
+	};
 }, function(elapsedMillis) {
+	if (this.paused) {
+		if (game.mouse.consumePressed(0)) {
+			this.paused = false;
+			this.camera.vx = this.pausedCamera;
+			if (!this.wasMuted) {
+				game.sounds.unmute();
+			}
+		} else {
+			return;
+		}
+	}
 	if (this.camera.x >= (levels[level].width * tileSize) + game.images.get("bg-right").width - canvas.width && this.camera.vx > 0) {
 		this.nextLevel();
 
@@ -954,6 +976,15 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		if (scene.timers.twoPlayerDead.running) {
 			scene.top.draw(context, (canvas.width / 2) - (scene.top.width / 2), (canvas.height / 4) - (scene.top.height / 2));
 			scene.bottom.draw(context, (canvas.width / 2) - (scene.bottom.width / 2), (canvas.height * 3 / 4) - (scene.bottom.height / 2));
+		}
+
+		if (scene.paused) {
+			context.fillStyle = "rgba(0, 0, 0, 0.7)";
+			context.fillRect(0, 0, canvas.width, canvas.height);
+
+			context.fillStyle = "#ffffff";
+			context.font = "32px bebasneue";
+			centerText(context, "TAP TO CONTINUE", 0, canvas.height / 2 - 16);
 		}
 	});
 }));
