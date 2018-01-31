@@ -11,7 +11,7 @@ var manifest = {
 	"images": {
 		"bg-left": "images/bg-left.png",
 		"bg-right": "images/bg-right.png",
-		"buy-screen": "images/buy-screen.png",
+
 		"next-topping-text": "images/next-topping-text.png",
 		"logo": "images/logo.png",
 		"particle-star": "images/particle-star.png",
@@ -86,52 +86,8 @@ var manifest = {
 			"msPerFrame": 75,
 			"repeatAt": 0
 		},
-		"button-achievements-disabled": {
-			"strip": "images/button-achievements-disabled.png",
-			"frames": 1,
-			"msPerFrame": 75,
-			"repeatAt": 0
-		},
-		"button-buy": {
-			"strip": "images/button-buy.png",
-			"frames": 25,
-			"msPerFrame": 45,
-			"repeatAt": 0,
-			"rotate": "ccw"
-		},
-		"button-buy-confirm": {
-			"strip": "images/button-buy-confirm.png",
-			"frames": 1,
-			"msPerFrame": 45,
-			"repeatAt": 0
-		},
-		"button-buy-down": {
-			"strip": "images/button-buy-down.png",
-			"frames": 10,
-			"msPerFrame": 30,
-			"repeatAt": 9,
-			"rotate": "ccw"
-		},
 		"button-leaderboard": {
 			"strip": "images/button-leaderboard.png",
-			"frames": 5,
-			"msPerFrame": 75,
-			"repeatAt": 0
-		},
-		"button-leaderboard-disabled": {
-			"strip": "images/button-leaderboard-disabled.png",
-			"frames": 1,
-			"msPerFrame": 75,
-			"repeatAt": 0
-		},
-		"button-not-yet": {
-			"strip": "images/button-not-yet.png",
-			"frames": 1,
-			"msPerFrame": 45,
-			"repeatAt": 0
-		},
-		"button-restore": {
-			"strip": "images/button-restore.png",
 			"frames": 5,
 			"msPerFrame": 75,
 			"repeatAt": 0
@@ -145,12 +101,6 @@ var manifest = {
 		"button-twoplayer": {
 			"strip": "images/button-twoplayer.png",
 			"frames": 5,
-			"msPerFrame": 25,
-			"repeatAt": 4
-		},
-		"button-twoplayer-disabled": {
-			"strip": "images/button-twoplayer-disabled.png",
-			"frames": 1,
 			"msPerFrame": 25,
 			"repeatAt": 4
 		},
@@ -230,6 +180,12 @@ var manifest = {
 			"msPerFrame": 75,
 			"repeatAt": 4
 		},
+		"raspberry-anim": {
+			"strip": "images/raspberry-anim.png",
+			"frames": 5,
+			"msPerFrame": 75,
+			"repeatAt": 4
+		},
 		"sugar-anim": {
 			"strip": "images/sugar-anim.png",
 			"frames": 5,
@@ -262,26 +218,14 @@ var best = 0;
 var newBest = false;
 
 var mode = "1p";
-var paid = false;
 
-function convertToPaid() {
-	paid = true;
-	game.scenes.switchTo("game-title");
-	Splat.saveData.set({
-		"paid": "true"
-	}, function(err) {});
-}
 
 function getSaveData() {
-	Splat.saveData.get(["bestScore", "paid"], function(err, data) {
+	Splat.saveData.get(["bestScore"], function(err, data) {
 		if (!err) {
 			var b = data["bestScore"];
 			if (b) {
 				best = parseInt(b);
-			}
-			var p = data["paid"];
-			if (p) {
-				paid = p === "true";
 			}
 		}
 	});
@@ -296,7 +240,7 @@ function setBest() {
 }
 
 function reportAchievement(achievement) {
-	if (!paid || mode !== "1p") {
+	if (mode !== "1p") {
 		return;
 	}
 	console.log("achievement unlocked", achievement);
@@ -423,14 +367,11 @@ function isInside(container, x, y) {
 }
 
 /*=========================================
-  Scenes 
+  Scenes
   ===========================================*/
 
 game.scenes.add("title", new Splat.Scene(canvas, function() {
 	this.timers.running = new Splat.Timer(null, 2000, function() {
-		if (!paid) {
-			Splat.ads.show(false);
-		}
 		game.scenes.switchTo("game-title");
 	});
 	this.timers.running.start();
@@ -448,9 +389,7 @@ game.scenes.add("title", new Splat.Scene(canvas, function() {
 }));
 
 game.scenes.add("game-title", new Splat.Scene(canvas, function() {
-	if (paid) {
-		Splat.ads.hide();
-	}
+
 	this.showLastScore = false;
 
 	var scene = this;
@@ -468,8 +407,8 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	var buttonHSpacing = 175;
 
 	var buttonCol1 = (canvas.width / 2) - 243;
-	var buttonCol2 = (canvas.width / 2) - (game.animations.get("button-restore").width / 2);
-	var buttonCol3 = (canvas.width / 2) + 243 - game.animations.get("button-restore").width;
+	var buttonCol2 = (canvas.width / 2) - 50;
+	var buttonCol3 = (canvas.width / 2) + (243 - 100);
 
 	var anim;
 
@@ -486,27 +425,15 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	soundToggle.isToggle = true;
 	this.buttons.push(soundToggle);
 
-	anim = game.animations.get(paid ? "button-leaderboard" : "button-leaderboard-disabled").copy();
+	anim = game.animations.get("button-leaderboard").copy();
 	this.buttons.push(new Splat.Button(game.mouse, buttonCol2, buttonTop, { pressDown: anim }, function(state) {
-		if (!paid) {
-			if (state === "pressed") {
-				game.sounds.play("gasp");
-			}
-			return;
-		}
 		if (state === "pressed") {
 			Splat.leaderboards.showLeaderboard("single_player");
 		}
 	}));
 
-	anim = game.animations.get(paid ? "button-achievements" : "button-achievements-disabled").copy();
+	anim = game.animations.get("button-achievements").copy();
 	this.buttons.push(new Splat.Button(game.mouse, buttonCol3, buttonTop, { pressDown: anim }, function(state) {
-		if (!paid) {
-			if (state === "pressed") {
-				game.sounds.play("gasp");
-			}
-			return;
-		}
 		if (state === "pressed") {
 			Splat.leaderboards.showAchievements();
 		}
@@ -526,14 +453,8 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		}
 	}));
 
-	anim = game.animations.get(paid ? "button-twoplayer" : "button-twoplayer-disabled").copy();
+	anim = game.animations.get("button-twoplayer").copy();
 	this.buttons.push(new Splat.Button(game.mouse, buttonCol3, buttonTop + buttonHSpacing, { pressDown: anim }, function(state) {
-		if (!paid) {
-			if (state === "pressed") {
-				game.sounds.play("gasp");
-			}
-			return;
-		}
 		if (state === "pressDown") {
 			game.sounds.play("bad-tap");
 			particles.add(100, game.mouse.x, game.mouse.y, 5, { radius: 25, color: "#6d511f" });
@@ -546,31 +467,6 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		}
 	}));
 
-	if (!paid) {
-		this.buttons.push(new Splat.Button(game.mouse, buttonCol1, buttonTop + 2 * buttonHSpacing - 13, { normal: game.animations.get("button-buy").copy(), pressDown: game.animations.get("button-buy-down") }, function(state) {
-			if (state === "pressDown") {
-				game.sounds.play("yay");
-				particles.add(100, game.mouse.x, game.mouse.y, 5, { image: game.images.get("starticle") });
-			} else if (this.state === "pressed") {
-				game.scenes.switchTo("buy");
-			}
-		}));
-
-		anim = game.animations.get("button-restore").copy();
-		this.buttons.push(new Splat.Button(game.mouse, buttonCol3, buttonTop + 2 * buttonHSpacing, { pressDown: anim }, function(state) {
-			if (this.state === "pressed") {
-				Splat.iap.restore(function(err, skus) {
-					if (err) {
-						console.error("Error restoring purchases", err);
-						return;
-					}
-					if (skus.indexOf("fullgame") !== -1) {
-						convertToPaid();
-					}
-				});
-			}
-		}));
-	}
 
 	var mouseUpHandler = function(x, y) {
 		if (x < 344 && y > 1039) {
@@ -590,10 +486,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		button.move(elapsedMillis);
 	});
 
-	// if (game.keyboard.consumePressed("p") || game.mouse.consumePressed(0, 0, Splat.ads.height, 100, 100)) {
-	// 	paid = !paid;
-	// 	game.scenes.switchTo("game-title");
-	// }
+
 }, function(context) {
 	var titleBackground = game.images.get("title-background");
 	for (var x = canvas.width / 2 - titleBackground.width; x > -titleBackground.width; x -= titleBackground.width) {
@@ -681,6 +574,11 @@ var toppings = {
 		particleColor: "#e33838",
 		sounds: popSounds
 	},
+	raspberry: {
+		animation: "raspberry-anim",
+		particleColor: "#4f032a",
+		sounds: popSounds
+	},
 	sugar: {
 		animation: "sugar-anim",
 		particleColor: "#ffffff",
@@ -703,6 +601,8 @@ var blueberryOnly = makeLevel.bind(undefined, [toppings.blueberry], undefined);
 var blueberryCream = makeLevel.bind(undefined, [toppings.blueberry, toppings.cream], "blueberry_and_cream");
 var strawberryOnly = makeLevel.bind(undefined, [toppings.strawberry], undefined);
 var strawberryCream = makeLevel.bind(undefined, [toppings.strawberry, toppings.cream], "strawberry_and_cream");
+var raspberryOnly = makeLevel.bind(undefined, [toppings.raspberry], undefined);
+var raspberryCream = makeLevel.bind(undefined, [toppings.raspberry, toppings.cream], "raspberry_and_cream");
 var chipOnly = makeLevel.bind(undefined, [toppings.chip], undefined);
 var chipCream = makeLevel.bind(undefined, [toppings.chip, toppings.cream], "chip_and_cream");
 
@@ -723,7 +623,7 @@ function generateLevels() {
 	}
 
 	var levelSequence = l % 5;
-	if (!paid || levelSequence === 0) {
+	if (levelSequence === 0) {
 		levels.push(butterOnly(width, speed, empty));
 		levels.push(butterSyrup(width, -speed, empty));
 	} else if (levelSequence === 1) {
@@ -990,16 +890,9 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 }));
 
 game.scenes.add("score", new Splat.Scene(canvas, function() {
-	if (!paid) {
-		Splat.ads.show(false);
-	}
 
 	this.timers.done = new Splat.Timer(undefined, 2000, function() {
-		if (paid) {
 			game.scenes.switchTo("game-title");
-		} else {
-			game.scenes.switchTo("buy");
-		}
 	});
 
 	this.score = 0;
@@ -1089,46 +982,6 @@ game.scenes.add("score", new Splat.Scene(canvas, function() {
 	particles.draw(context);
 }));
 
-game.scenes.add("buy", new Splat.Scene(canvas, function() {
-	Splat.ads.hide();
 
-	var anim = game.animations.get("button-buy-confirm").copy();
-	var x = canvas.width / 2 - anim.width / 2;
-	this.buyButton = new Splat.Button(game.mouse, x, 860, { pressDown: anim }, function(state) {
-		if (state === "pressed") {
-			game.sounds.play("yay");
-			Splat.iap.get("fullgame", function(err, product) {
-				if (err) {
-					console.error("Error fetching sku", err);
-					return;
-				}
-				Splat.iap.buy(product, 1, function(err) {
-					if (err) {
-						console.error("Error buying product", err);
-						return;
-					}
-					convertToPaid();
-				});
-			});
-		}
-	});
-	anim = game.animations.get("button-not-yet").copy();
-	x = canvas.width / 2 - anim.width / 2;
-	this.notYetButton = new Splat.Button(game.mouse, x, 1050, { pressDown: anim }, function(state) {
-		if (state === "pressed") {
-			game.sounds.play("gasp");
-			Splat.ads.show(false);
-			game.scenes.switchTo("game-title");
-		}
-	});
-}, function(elapsedMillis) {
-	this.buyButton.move(elapsedMillis);
-	this.notYetButton.move(elapsedMillis);
-}, function(context) {
-	var bg = game.images.get("buy-screen");
-	context.drawImage(bg, canvas.width / 2 - bg.width / 2, 0);
-	this.buyButton.draw(context);
-	this.notYetButton.draw(context);
-}));
 
 game.scenes.switchTo("loading");
