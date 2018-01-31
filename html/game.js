@@ -517,12 +517,12 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	var cavityTextY = cavityY + 110;
 	if (this.showLastScore) {
 		context.fillText("Last:", cavityX + 40, cavityTextY);
-		context.font = "80px bebasneue";
+		context.font = "80px BebasNeue";
 		var w = context.measureText(score).width;
 		context.fillText(score, cavityX + scoreCavity.width - w - 40, cavityTextY);
 	} else {
 		context.fillText("Best:", cavityX + 40, cavityTextY);
-		context.font = "80px bebasneue";
+		context.font = "80px BebasNeue";
 		var w = context.measureText(best).width;
 		context.fillText(best, cavityX + scoreCavity.width - w - 40, cavityTextY);
 	}
@@ -857,7 +857,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 			context.drawImage(tab, (canvas.width / 2) - (tab.width / 2), 0);
 
 			context.fillStyle = "#4b4b4b";
-			context.font = "72px bebasneue";
+			context.font = "72px BebasNeue";
 			centerText(context, score, 0, 65);
 		}
 
@@ -883,7 +883,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 			context.fillRect(0, 0, canvas.width, canvas.height);
 
 			context.fillStyle = "#ffffff";
-			context.font = "32px bebasneue";
+			context.font = "32px BebasNeue";
 			centerText(context, "TAP TO CONTINUE", 0, canvas.height / 2 - 16);
 		}
 	});
@@ -957,7 +957,7 @@ game.scenes.add("score", new Splat.Scene(canvas, function() {
 		context.fillStyle = "#ffffff";
 		context.font = "50px olivier";
 		centerText(context, "SCORE", 0, 300);
-		context.font = "100px bebasneue";
+		context.font = "100px BebasNeue";
 		centerText(context, this.score, 0, 400);
 	}
 
@@ -974,7 +974,7 @@ game.scenes.add("score", new Splat.Scene(canvas, function() {
 			centerText(context, "BEST", 0, 600);
 		}
 
-		context.font = "100px bebasneue";
+		context.font = "100px BebasNeue";
 		centerText(context, best, 0, 700);
 	}
 
