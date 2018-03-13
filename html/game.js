@@ -11,7 +11,6 @@ var manifest = {
 	"images": {
 		"bg-left": "images/bg-left.png",
 		"bg-right": "images/bg-right.png",
-
 		"next-topping-text": "images/next-topping-text.png",
 		"logo": "images/logo.png",
 		"particle-star": "images/particle-star.png",
@@ -26,20 +25,19 @@ var manifest = {
 		"waffle-hole": "images/waffle-hole.png",
 	},
 	"sounds": {
-		"button": "sound/menuchange.wav",
-		"music": "sound/RoccoW_-_02_-_Weeklybeats_2014_2_-_Daniels_Kruis2.mp3",
-		"bad-tap": "sound/196725__paulmorek__sz-squish-12.wav",
-		"gasp": "sound/180005__gentlemanwalrus__shocked-gasp.wav",
+		"music": "sound/music.mp3",
+		"bad-tap": "sound/bad-tap.mp3",
+		"gasp": "sound/gasp.mp3",
 		"yay": "sound/yay.mp3",
 		"next-topping": "sound/next-topping.mp3",
-		"pop1": "sound/pop1.wav",
-		"pop2": "sound/pop2.wav",
-		"pop3": "sound/pop3.wav",
-		"pop4": "sound/pop4.wav",
-		"pop5": "sound/pop5.wav",
-		"pop6": "sound/pop6.wav",
-		"pop7": "sound/pop7.wav",
-		"pop8": "sound/pop8.wav",
+		"pop1": "sound/pop1.mp3",
+		"pop2": "sound/pop2.mp3",
+		"pop3": "sound/pop3.mp3",
+		"pop4": "sound/pop4.mp3",
+		"pop5": "sound/pop5.mp3",
+		"pop6": "sound/pop6.mp3",
+		"pop7": "sound/pop7.mp3",
+		"pop8": "sound/pop8.mp3",
 		"sugar1": "sound/sugar-1.mp3",
 		"sugar2": "sound/sugar-2.mp3",
 		"whip1": "sound/whip-1.mp3",
@@ -197,13 +195,7 @@ var manifest = {
 			"frames": 5,
 			"msPerFrame": 75,
 			"repeatAt": 4
-		},
-		"two-scoop": {
-			"strip": "images/two-scoop-anim.png",
-			"frames": 32,
-			"msPerFrame": 50,
-			"repeatAt": 31
-		},
+		}
 	}
 };
 
@@ -371,24 +363,6 @@ function isInside(container, x, y) {
   ===========================================*/
 
 game.scenes.add("title", new Splat.Scene(canvas, function() {
-	this.timers.running = new Splat.Timer(null, 2000, function() {
-		game.scenes.switchTo("game-title");
-	});
-	this.timers.running.start();
-}, function(elapsedMillis) {
-	game.animations.get("two-scoop").move(elapsedMillis);
-}, function(context) {
-	context.fillStyle = "#93cbcd";
-	context.fillRect(0, 0, canvas.width, canvas.height);
-	var anim = game.animations.get("two-scoop");
-	context.fillStyle = "#ffffff";
-	context.font = "50px olivier";
-	centerText(context, "Two Scoop Games", 0, (canvas.height / 2) + (anim.height / 2) + 30);
-
-	anim.draw(context, (canvas.width / 2) - (anim.width / 2), (canvas.height / 2) - (anim.height / 2));
-}));
-
-game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 
 	this.showLastScore = false;
 
@@ -693,7 +667,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 		scene.top.move(elapsedMillis);
 		scene.bottom.move(elapsedMillis);
 	}, 5000, function() {
-		game.scenes.switchTo("game-title");
+		game.scenes.switchTo("title");
 	});
 
 	this.visibilitychange = function(state) {
@@ -892,7 +866,7 @@ game.scenes.add("main", new Splat.Scene(canvas, function() {
 game.scenes.add("score", new Splat.Scene(canvas, function() {
 
 	this.timers.done = new Splat.Timer(undefined, 2000, function() {
-			game.scenes.switchTo("game-title");
+			game.scenes.switchTo("title");
 	});
 
 	this.score = 0;
